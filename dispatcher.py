@@ -16,7 +16,7 @@ if not config.BOT_TOKEN:
 bot = Bot(token=config.BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher(bot, storage=RedisStorage2(
     host=config.REDIS_URL["host"], port=config.REDIS_URL["port"],
-    password=config.REDIS_URL["password"], ssl=True
+    password=config.REDIS_URL["password"], ssl=False
 ))
 dp.middleware.setup(LoggingMiddleware())
 
