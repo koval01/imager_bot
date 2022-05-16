@@ -1,5 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher
+from aiogram.contrib.fsm_storage.redis import RedisStorage2
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from static.filters import IsOwnerFilter, IsModeratorFilter, IsAdminFilter, MemberCanRestrictFilter
 from static import config
 
@@ -12,7 +14,11 @@ if not config.BOT_TOKEN:
 
 # init
 bot = Bot(token=config.BOT_TOKEN, parse_mode="HTML")
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=RedisStorage2(
+    host=config.REDIS_URL["host"], port=config.REDIS_URL["port"],
+    password=config.REDIS_URL["password"], ssl=True
+))
+dp.middleware.setup(LoggingMiddleware())
 
 # activate filters
 dp.filters_factory.bind(IsOwnerFilter)

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "449d8c4b1a735be22b088e31ba42aefc72162580d7ba3227796453bea4242992"
+            "sha256": "483a411a17e5e200e270b2d6adc7bb0f9fb36af8092d7640a45157b9428c12b8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -101,6 +101,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==3.8.1"
+        },
+        "aioredis": {
+            "hashes": [
+                "sha256:9ac0d0b3b485d293b8ca1987e6de8658d7dafcca1cddfcd1d506cae8cdebfdd6",
+                "sha256:eaa51aaf993f2d71f54b70527c440437ba65340588afeb786cd87c55c89cd98e"
+            ],
+            "index": "pypi",
+            "version": "==2.0.1"
         },
         "aiosignal": {
             "hashes": [
@@ -335,6 +343,14 @@
             ],
             "index": "pypi",
             "version": "==1.4.36"
+        },
+        "typing-extensions": {
+            "hashes": [
+                "sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708",
+                "sha256:f1c24655a0da0d1b67f07e17a5e6b2a105894e6824b92096378bb3668ef02376"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==4.2.0"
         },
         "yarl": {
             "hashes": [
