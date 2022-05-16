@@ -26,7 +26,8 @@ class IsModeratorFilter(BoundFilter):
         self.is_moderator = is_moderator
 
     async def check(self, message: types.Message):
-        return message.from_user.id in config.MODERATORS
+        return (message.from_user.id in config.MODERATORS) \
+               or (message.from_user.id == config.BOT_OWNER)
 
 
 class IsAdminFilter(BoundFilter):
