@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
-from handlers.fsm import ViewContent
+from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector, Manager
 from utils.throttling import rate_limit
 
@@ -44,6 +44,12 @@ async def init_select(msg: types.Message):
     await msg.reply(dict_reply["select_mode"], reply_markup=build_menu("select_mode"))
 
 
+@dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1])
+async def init_load_content(msg: types.Message):
+    await TakeContent.wait_content.set()
+    await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
+
+
 @dp.message_handler(lambda message: message.text not in dict_menu["select_mode"], state=ViewContent.select_mode)
 @rate_limit(2, 'error_select_content_type')
 async def invalid_select_content(msg: types.Message):
@@ -56,7 +62,9 @@ async def invalid_select_action(msg: types.Message):
     await msg.reply(dict_reply["error_action"], reply_markup=build_menu("next_content"))
 
 
-@dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=ViewContent.view_mode)
+@dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=[
+    ViewContent.view_mode, TakeContent.wait_content, TakeContent.load_confirm
+])
 async def cancel_action(msg: types.Message, state: FSMContext):
     await msg.reply(dict_reply["canceled_action"], reply_markup=build_menu("start_menu"))
     await state.finish()
