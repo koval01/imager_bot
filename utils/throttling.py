@@ -90,5 +90,5 @@ class ThrottlingMiddleware(BaseMiddleware):
         thr = await dispatcher.check_key(key)
 
         # If current message is not last with current key - do not send message
-        if thr.exceeded_count == throttled.exceeded_count:
+        if (thr.exceeded_count == throttled.exceeded_count) and (throttled.rate > 3):
             await message.reply(reply_dict["throttling_use_again"])
