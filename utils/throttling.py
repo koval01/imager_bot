@@ -1,22 +1,22 @@
 import asyncio
 
 from aiogram import types
-from dispatcher import dp as Dispatcher
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
-from static.messages import dictionary as dict_reply
+
+from dispatcher import dp
+from static.messages import dictionary as reply_dict
 
 
-def rate_limit(limit: int, key=None):
+def rate_limit(limit: float, key=None):
     """
     Decorator for configuring rate limit and key in different functions.
     :param limit:
     :param key:
     :return:
     """
-
     def decorator(func):
         setattr(func, 'throttling_rate_limit', limit)
         if key:
@@ -45,7 +45,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         handler = current_handler.get()
 
         # Get dispatcher from context
-        dispatcher = Dispatcher.get_current()
+        dispatcher = dp.get_current()
         # If handler was configured, get rate limit and key from handler
         if handler:
             limit = getattr(handler, 'throttling_rate_limit', self.rate_limit)
@@ -71,7 +71,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         :param throttled:
         """
         handler = current_handler.get()
-        dispatcher = Dispatcher.get_current()
+        dispatcher = dp.get_current()
         if handler:
             key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
         else:
@@ -82,7 +82,7 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         # Prevent flooding
         if throttled.exceeded_count <= 2:
-            await message.reply(dict_reply["throttling_message"])
+            await message.reply(reply_dict["throttling_message"])
 
         # Sleep.
         await asyncio.sleep(delta)
@@ -92,4 +92,4 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         # If current message is not last with current key - do not send message
         if thr.exceeded_count == throttled.exceeded_count:
-            await message.reply(dict_reply["throttling_use_again"])
+            await message.reply(reply_dict["throttling_use_again"])

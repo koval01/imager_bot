@@ -4,8 +4,8 @@ from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent
-from handlers.throttling import rate_limit
 from content.selector import Selector, Manager
+from utils.throttling import rate_limit
 
 
 async def start_bot(msg: types.Message, moderator: bool = False):
@@ -63,7 +63,7 @@ async def cancel_action(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
-@rate_limit(5, 'next_content')
+@rate_limit(15, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
