@@ -63,7 +63,7 @@ async def cancel_action(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
-@rate_limit(15, 'next_content')
+@rate_limit(1, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
