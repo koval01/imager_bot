@@ -4,6 +4,7 @@ from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent
+from handlers.throttling import rate_limit
 from content.selector import Selector, Manager
 
 
@@ -14,7 +15,14 @@ async def start_bot(msg: types.Message, moderator: bool = False):
         else await msg.reply(dict_reply["internal_error"] % "ErrorUserModel")
 
 
+@dp.message_handler(chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
+@rate_limit(120, 'group_init')
+async def group_handler(msg: types.Message):
+    await msg.reply(dict_reply["group_answer"])
+
+
 @dp.message_handler(is_banned=True)
+@rate_limit(600, 'banned_user')
 async def send_welcome_moderator(msg: types.Message):
     await msg.answer(dict_reply["banned_user"])
 
@@ -25,6 +33,7 @@ async def send_welcome_moderator(msg: types.Message):
 
 
 @dp.message_handler(commands=['start', 'help'])
+@rate_limit(3, 'start_command')
 async def send_welcome(msg: types.Message):
     await start_bot(msg)
 
@@ -36,11 +45,13 @@ async def init_select(msg: types.Message):
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["select_mode"], state=ViewContent.select_mode)
+@rate_limit(2, 'error_select_content_type')
 async def invalid_select_content(msg: types.Message):
     await msg.reply(dict_reply["error_select"], reply_markup=build_menu("select_mode"))
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["next_content"], state=ViewContent.view_mode)
+@rate_limit(2, 'error_select_content_action')
 async def invalid_select_action(msg: types.Message):
     await msg.reply(dict_reply["error_action"], reply_markup=build_menu("next_content"))
 
@@ -52,6 +63,7 @@ async def cancel_action(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
+@rate_limit(5, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
@@ -67,5 +79,6 @@ async def select_content(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler()
+@rate_limit(3, 'any_data')
 async def any_messages(msg: types.Message):
     await msg.reply(dict_reply["unknown_answer"])
