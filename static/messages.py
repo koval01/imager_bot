@@ -11,7 +11,7 @@ dictionary = {
         menu_dict["next_content"][1], menu_dict["next_content"][0]
     ),
     "canceled_action": "Хорошо, пошли в главное меню.",
-    "no_content": "Нет никакого контента в этой категории, извини.",
+    "no_content": "Нет никакого контента в этой категории, извини. Возможно ты уже всё просмотрел.",
     "internal_error": "Ошибка...\n\nДетали: <code>%s</code>",
     "banned_user": "Забанен! Иди на хуй"
 }

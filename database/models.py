@@ -10,6 +10,7 @@ class ChoiceType(TypeDecorator):
     """A tool for creating a selection method"""
 
     impl = String
+    cache_ok = False
 
     def __init__(self, choices, **kw):
         self.choices = dict(choices)

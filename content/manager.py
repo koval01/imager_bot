@@ -67,14 +67,16 @@ class Manager:
     def _get_content(self) -> str:
         x = self.session.query(Content).filter_by(
             moderated=False, type_content=self.type_content)
+        l = self._get_last_id
+        try: x[l]
+        except IndexError: return ""
         return "" if not self._update_last_id_content \
-            else (x[self._get_last_id].file_id if x.count() else "")
+            else (x[l].file_id if x.count() else "")
 
     @property
     def _get_last_id(self) -> int:
         x = self.session.query(User).filter_by(
             banned=False, user_id=self.user_id).all()
-        print(self.user_id, type(self.user_id))
         return eval(f"int(x[0].last_{self.type_content})")
 
     @property
@@ -82,9 +84,9 @@ class Manager:
         try:
             self.session.query(User).filter_by(
                 user_id=self.user_id
-            ).update({
-                eval(f"User.last_{self.type_content}: User.last_{self.type_content} + 1")
-            })
+            ).update(
+                eval("{User.last_%s: User.last_%s + 1}" % (self.type_content, self.type_content))
+            )
             self.session.commit()
             return True
         except Exception as e:
