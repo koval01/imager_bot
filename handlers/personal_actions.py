@@ -4,16 +4,29 @@ from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent
+from content.selector import Selector, Manager
+
+
+async def start_bot(msg: types.Message, moderator: bool = False):
+    menu = "moderator_start_menu" if moderator else "start_menu"
+    await msg.reply(dict_reply["start_message"], reply_markup=build_menu(menu)) \
+        if Manager(user_id=msg.from_user.id).check_user \
+        else await msg.reply(dict_reply["internal_error"] % "ErrorUserModel")
+
+
+@dp.message_handler(is_banned=True)
+async def send_welcome_moderator(msg: types.Message):
+    await msg.answer(dict_reply["banned_user"])
 
 
 @dp.message_handler(commands=['start', 'help'], is_moderator=True)
 async def send_welcome_moderator(msg: types.Message):
-    await msg.reply(dict_reply["start_message"], reply_markup=build_menu("moderator_start_menu"))
+    await start_bot(msg, moderator=True)
 
 
-@dp.message_handler(commands=['start', 'help'], is_moderator=False)
+@dp.message_handler(commands=['start', 'help'])
 async def send_welcome(msg: types.Message):
-    await msg.reply(dict_reply["start_message"], reply_markup=build_menu("start_menu"))
+    await start_bot(msg)
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
@@ -38,11 +51,19 @@ async def cancel_action(msg: types.Message, state: FSMContext):
     await state.finish()
 
 
+@dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
+async def next_action(msg: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        msg.text = data["select"]
+        await Selector(msg).reply
+
+
 @dp.message_handler(lambda message: message.text in dict_menu["select_mode"], state=ViewContent.select_mode)
 async def select_content(msg: types.Message, state: FSMContext):
     await ViewContent.next()
     await state.update_data(select=msg.text)
     await msg.reply(dict_reply["view_content"], reply_markup=build_menu("next_content"))
+    await Selector(msg).reply
 
 
 @dp.message_handler()

@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
 from static import config
+from content.manager import Manager
 
 
 class IsOwnerFilter(BoundFilter):
@@ -28,6 +29,19 @@ class IsModeratorFilter(BoundFilter):
     async def check(self, message: types.Message):
         return (message.from_user.id in config.MODERATORS) \
                or (message.from_user.id == config.BOT_OWNER)
+
+
+class IsBannedFilter(BoundFilter):
+    """
+    Custom filter "is_banned".
+    """
+    key = "is_banned"
+
+    def __init__(self, is_banned):
+        self.is_banned = is_banned
+
+    async def check(self, message: types.Message):
+        return Manager(user_id=message.from_user.id).check_ban
 
 
 class IsAdminFilter(BoundFilter):

@@ -7,6 +7,7 @@ name = "pypi"
 aiogram = "*"
 sqlalchemy = "*"
 aioredis = "*"
+psycopg2 = "*"
 
 [dev-packages]
 

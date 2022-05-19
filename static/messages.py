@@ -10,5 +10,8 @@ dictionary = {
     "view_content": "Используй кнопку %s, чтобы листать или %s чтобы выйти." % (
         menu_dict["next_content"][1], menu_dict["next_content"][0]
     ),
-    "canceled_action": "Хорошо, пошли в главное меню."
+    "canceled_action": "Хорошо, пошли в главное меню.",
+    "no_content": "Нет никакого контента в этой категории, извини.",
+    "internal_error": "Ошибка...\n\nДетали: <code>%s</code>",
+    "banned_user": "Забанен! Иди на хуй"
 }
