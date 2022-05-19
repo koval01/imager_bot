@@ -66,7 +66,7 @@ class Manager:
     @property
     def _get_content(self) -> str:
         x = self.session.query(Content).filter_by(
-            moderated=False, type_content=self.type_content)
+            moderated=True, type_content=self.type_content)
         l = self._get_last_id
         try: x[l]
         except IndexError: return ""
