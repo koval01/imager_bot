@@ -1,12 +1,11 @@
 import asyncio
 
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
 
-from dispatcher import dp
 from static.messages import dictionary as reply_dict
 
 
@@ -45,7 +44,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         handler = current_handler.get()
 
         # Get dispatcher from context
-        dispatcher = dp.get_current()
+        dispatcher = Dispatcher.get_current()
         # If handler was configured, get rate limit and key from handler
         if handler:
             limit = getattr(handler, 'throttling_rate_limit', self.rate_limit)
@@ -71,7 +70,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         :param throttled:
         """
         handler = current_handler.get()
-        dispatcher = dp.get_current()
+        dispatcher = Dispatcher.get_current()
         if handler:
             key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
         else:

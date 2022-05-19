@@ -5,6 +5,7 @@ from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from static.filters import IsOwnerFilter, IsModeratorFilter, \
     IsAdminFilter, MemberCanRestrictFilter, IsBannedFilter
 from static import config
+from utils.throttling import ThrottlingMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +21,7 @@ dp = Dispatcher(bot, storage=RedisStorage2(
     password=config.REDIS_URL["password"], ssl=False
 ))
 dp.middleware.setup(LoggingMiddleware())
+dp.middleware.setup(ThrottlingMiddleware())
 
 # activate filters
 dp.filters_factory.bind(IsOwnerFilter)
