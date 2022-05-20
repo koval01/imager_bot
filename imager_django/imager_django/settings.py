@@ -88,7 +88,7 @@ DATABASES = {
         'USER': DATABASE_URL_ELS["user"],
         'PASSWORD': DATABASE_URL_ELS["password"],
         'HOST': DATABASE_URL_ELS["host"],
-        'PORT': '5432',
+        'PORT': DATABASE_URL_ELS["port"],
         'OPTIONS': {'sslmode': True},
     }
 }
