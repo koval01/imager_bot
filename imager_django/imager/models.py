@@ -28,6 +28,8 @@ class User(models.Model):
     last_video = models.BigIntegerField("ID последнего видео")
     last_voice = models.BigIntegerField("ID последнего голосового")
 
+    exclude = ('last_photo', 'last_video', 'last_voice',)
+
     def __str__(self):
         return "%s (Забанен: %s)" % (self.user_id, self.banned)
 
