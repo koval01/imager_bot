@@ -10,6 +10,7 @@ aioredis = "*"
 psycopg2 = "*"
 django = "*"
 gunicorn = "*"
+whitenoise = "*"
 
 [dev-packages]
 

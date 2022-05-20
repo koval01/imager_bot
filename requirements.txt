@@ -28,4 +28,5 @@ setuptools==62.3.2; python_version >= '3.7'
 sqlalchemy==1.4.36
 sqlparse==0.4.2; python_full_version >= '3.5.0'
 typing-extensions==4.2.0; python_version >= '3.7'
+whitenoise==6.1.0
 yarl==1.7.2; python_version >= '3.6'
