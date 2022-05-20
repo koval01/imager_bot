@@ -10,7 +10,7 @@ class Content(models.Model):
 
     type_content = models.CharField('Тип контента', choices=CONTENT_TYPE, null=False, max_length=5)
     loader_id = models.BigIntegerField('ID юзера', null=False)
-    file_id = models.CharField('ID файла', null=False, db_index=True, unique=True, max_length=255)
+    file_id = models.CharField('ID файла', null=False, db_index=True, unique=True, max_length=255, editable=False)
     moderated = models.BooleanField('Проверенный')
 
     def __str__(self):
@@ -24,11 +24,9 @@ class Content(models.Model):
 class User(models.Model):
     user_id = models.BigIntegerField("ID юзера", null=False, db_index=True, unique=True)
     banned = models.BooleanField("Забанен")
-    last_photo = models.BigIntegerField("ID последнего фото")
-    last_video = models.BigIntegerField("ID последнего видео")
-    last_voice = models.BigIntegerField("ID последнего голосового")
-
-    exclude = ('last_photo', 'last_video', 'last_voice',)
+    last_photo = models.BigIntegerField("ID последнего фото", editable=False)
+    last_video = models.BigIntegerField("ID последнего видео", editable=False)
+    last_voice = models.BigIntegerField("ID последнего голосового", editable=False)
 
     def __str__(self):
         return "%s (Забанен: %s)" % (self.user_id, self.banned)
