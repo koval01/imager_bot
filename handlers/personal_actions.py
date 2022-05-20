@@ -10,13 +10,6 @@ from content.loader import LoaderContent
 from utils.throttling import rate_limit
 
 
-async def start_bot(msg: types.Message, moderator: bool = False):
-    menu = "moderator_start_menu" if moderator else "start_menu"
-    await msg.reply(dict_reply["start_message"], reply_markup=build_menu(menu)) \
-        if Manager(user_id=msg.from_user.id).check_user \
-        else await msg.reply(dict_reply["internal_error"] % "ErrorUserModel")
-
-
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
 @rate_limit(120, 'group_init')
 async def group_handler(msg: types.Message):
@@ -25,7 +18,7 @@ async def group_handler(msg: types.Message):
 
 @dp.message_handler(is_banned=True)
 @rate_limit(600, 'banned_user')
-async def send_welcome_moderator(msg: types.Message):
+async def send_banned_message(msg: types.Message):
     await msg.answer(dict_reply["banned_user"])
 
 
@@ -38,15 +31,10 @@ async def cancel_action(msg: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler(commands=['start', 'help'], is_moderator=True)
-async def send_welcome_moderator(msg: types.Message):
-    await start_bot(msg, moderator=True)
-
-
 @dp.message_handler(commands=['start', 'help'])
 @rate_limit(3, 'start_command')
 async def send_welcome(msg: types.Message):
-    await start_bot(msg)
+    await msg.reply(dict_reply["start_message"], reply_markup=build_menu("start_menu"))
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])

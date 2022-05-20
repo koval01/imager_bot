@@ -5,7 +5,6 @@ from aiogram.types import ReplyKeyboardRemove, \
 
 dictionary = {
     "start_menu": ["Смотреть", "Добавить"],
-    "moderator_start_menu": ["Смотреть", "Добавить", "Проверить"],
     "select_mode": ["Фото", "Видео", "Голосовые"],
     "cancel": ["🙅‍♂️"],
     "next_content": ["🙅‍♂️", "➡️"]
