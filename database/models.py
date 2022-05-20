@@ -40,7 +40,7 @@ class DictMixIn:
 class Content(Base):
     """Content bot model"""
 
-    __tablename__ = "Content"
+    __tablename__ = "imager_content"
 
     id = Column(Integer, primary_key=True, index=True)
     type_content = Column(
@@ -60,7 +60,7 @@ class Content(Base):
 class User(Base):
     """User bot model"""
 
-    __tablename__ = "User"
+    __tablename__ = "imager_user"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(BigInteger, nullable=False, index=True, unique=True)
