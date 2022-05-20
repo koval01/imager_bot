@@ -24,9 +24,9 @@ class Content(models.Model):
 class User(models.Model):
     user_id = models.BigIntegerField("ID юзера", null=False, db_index=True, unique=True)
     banned = models.BooleanField("Забанен")
-    last_photo = models.BigIntegerField("ID последнего фото", editable=False)
-    last_video = models.BigIntegerField("ID последнего видео", editable=False)
-    last_voice = models.BigIntegerField("ID последнего голосового", editable=False)
+    last_photo = models.BigIntegerField("ID последнего фото")
+    last_video = models.BigIntegerField("ID последнего видео")
+    last_voice = models.BigIntegerField("ID последнего голосового")
 
     def __str__(self):
         return "%s (Забанен: %s)" % (self.user_id, self.banned)
