@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import re, os
+import re
+import os
 
 pattern_postgres = re.compile(r"postgres:\/\/(?P<user>[A-z0-9]*?):(?P<password>[A-z0-9]*?)@(?P<host>[A-z0-9\-\.]*?)"
                               r":(?P<port>[0-9]{4,5})\/(?P<database>[A-z0-9]*$)")
