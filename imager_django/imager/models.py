@@ -8,9 +8,9 @@ class Content(models.Model):
         ('voice', 'Голосовое'),
     ]
 
-    type_content = models.CharField('Тип контента', choices=CONTENT_TYPE, null=False)
+    type_content = models.CharField('Тип контента', choices=CONTENT_TYPE, null=False, max_length=5)
     loader_id = models.BigIntegerField('ID юзера', null=False)
-    file_id = models.CharField('ID файла', null=False, db_index=True, unique=True)
+    file_id = models.CharField('ID файла', null=False, db_index=True, unique=True, max_length=255)
     moderated = models.BooleanField('Проверенный')
 
     def __str__(self):

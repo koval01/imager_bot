@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from static import config
-from static.config import DATABASE_URL_ELS
+import re, os
+
+pattern_postgres = re.compile(r"postgres:\/\/(?P<user>[A-z0-9]*?):(?P<password>[A-z0-9]*?)@(?P<host>[A-z0-9\-\.]*?)"
+                              r":(?P<port>[0-9]{4,5})\/(?P<database>[A-z0-9]*$)")
+DATABASE_URL_ELS = re.search(pattern_postgres, str(os.getenv("DATABASE_URL"))).groupdict()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +30,7 @@ SECRET_KEY = 'django-insecure-<7f72oq45i5s:tv{7fvl}m<dhn|kr8n2??c4j|u:f1>6020ym}
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [config.APP_DOMAIN]
+ALLOWED_HOSTS = [os.getenv("APP_DOMAIN")]
 
 
 # Application definition
