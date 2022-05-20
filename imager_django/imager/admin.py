@@ -3,8 +3,9 @@ from .models import Content, User
 
 
 class ContentAdmin(admin.ModelAdmin):
-    fields = 'user_id', 'banned', 'last_photo', 'last_video', 'last_voice'
-    readonly_fields = 'last_photo', 'last_video', 'last_voice'
+    list_display = ('user_id', 'banned', 'last_photo', 'last_video', 'last_voice')
+    fields = ('user_id', 'banned', 'last_photo', 'last_video', 'last_voice')
+    readonly_fields = ('user_id', 'last_photo', 'last_video', 'last_voice')
 
 
 admin.site.register(Content, ContentAdmin)
