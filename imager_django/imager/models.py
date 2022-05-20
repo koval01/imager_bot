@@ -29,7 +29,7 @@ class User(models.Model):
     last_voice = models.BigIntegerField("ID последнего голосового")
 
     def __str__(self):
-        return "%s (Проверенный: %s)" % (self.type_content, self.moderated)
+        return "%s (Забанен: %s)" % (self.user_id, self.banned)
 
     class Meta:
         verbose_name = 'Пользователь'
