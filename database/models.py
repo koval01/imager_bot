@@ -46,11 +46,13 @@ class Content(Base):
     type_content = Column(
         ChoiceType({"photo": "photo", "video": "video", "voice": "voice"}), nullable=False
     )
+    loader_id = Column(BigInteger, nullable=False)
     file_id = Column(String(255), nullable=False, index=True, unique=True)
     moderated = Column(Boolean)
 
-    def __init__(self, type_content, file_id, moderated):
+    def __init__(self, type_content, loader_id, file_id, moderated):
         self.type_content = type_content
+        self.loader_id = loader_id
         self.file_id = file_id
         self.moderated = moderated
 

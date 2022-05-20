@@ -8,4 +8,3 @@ class ViewContent(StatesGroup):
 
 class TakeContent(StatesGroup):
     wait_content = State()
-    load_confirm = State()

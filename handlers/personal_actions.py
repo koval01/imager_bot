@@ -1,10 +1,12 @@
 from aiogram import types
+from aiogram.types import ChatType, ContentType
 from aiogram.dispatcher import FSMContext
 from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector, Manager
+from content.loader import LoaderContent
 from utils.throttling import rate_limit
 
 
@@ -15,7 +17,7 @@ async def start_bot(msg: types.Message, moderator: bool = False):
         else await msg.reply(dict_reply["internal_error"] % "ErrorUserModel")
 
 
-@dp.message_handler(chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
+@dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
 @rate_limit(120, 'group_init')
 async def group_handler(msg: types.Message):
     await msg.reply(dict_reply["group_answer"])
@@ -25,6 +27,15 @@ async def group_handler(msg: types.Message):
 @rate_limit(600, 'banned_user')
 async def send_welcome_moderator(msg: types.Message):
     await msg.answer(dict_reply["banned_user"])
+
+
+@dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=[
+    ViewContent.view_mode, TakeContent.wait_content
+])
+@rate_limit(1.5, 'cancel_action')
+async def cancel_action(msg: types.Message, state: FSMContext):
+    await msg.reply(dict_reply["canceled_action"], reply_markup=build_menu("start_menu"))
+    await state.finish()
 
 
 @dp.message_handler(commands=['start', 'help'], is_moderator=True)
@@ -39,15 +50,29 @@ async def send_welcome(msg: types.Message):
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
+@rate_limit(2, 'init_select')
 async def init_select(msg: types.Message):
     await ViewContent.select_mode.set()
     await msg.reply(dict_reply["select_mode"], reply_markup=build_menu("select_mode"))
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1])
+@rate_limit(2, 'init_load_content')
 async def init_load_content(msg: types.Message):
     await TakeContent.wait_content.set()
     await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
+
+
+@dp.message_handler(content_types=[
+    ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
+], state=TakeContent.wait_content)
+async def wait_content_handler(msg: types.Message):
+    await msg.reply(str(LoaderContent(msg)))
+
+
+@dp.message_handler(state=TakeContent.wait_content)
+async def wait_content_handler_invalid_type(msg: types.Message):
+    await msg.reply(dict_reply["invalid_content_type"])
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["select_mode"], state=ViewContent.select_mode)
@@ -60,14 +85,6 @@ async def invalid_select_content(msg: types.Message):
 @rate_limit(2, 'error_select_content_action')
 async def invalid_select_action(msg: types.Message):
     await msg.reply(dict_reply["error_action"], reply_markup=build_menu("next_content"))
-
-
-@dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=[
-    ViewContent.view_mode, TakeContent.wait_content, TakeContent.load_confirm
-])
-async def cancel_action(msg: types.Message, state: FSMContext):
-    await msg.reply(dict_reply["canceled_action"], reply_markup=build_menu("start_menu"))
-    await state.finish()
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
