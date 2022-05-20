@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [os.getenv("APP_DOMAIN")]
 # Application definition
 
 INSTALLED_APPS = [
-    'imager_django.imager',
+    'imager',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
