@@ -8,6 +8,8 @@ aiogram = "*"
 sqlalchemy = "*"
 aioredis = "*"
 psycopg2 = "*"
+django = "*"
+gunicorn = "*"
 
 [dev-packages]
 
