@@ -25,7 +25,6 @@ async def send_banned_message(msg: types.Message):
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=[
     ViewContent.view_mode, TakeContent.wait_content
 ])
-@rate_limit(1.5, 'cancel_action')
 async def cancel_action(msg: types.Message, state: FSMContext):
     await msg.reply(dict_reply["canceled_action"], reply_markup=build_menu("start_menu"))
     await state.finish()
