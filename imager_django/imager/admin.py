@@ -1,5 +1,17 @@
 from django.contrib import admin
-from .models import Content, User
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User as User_DJ
+from .models import Content, User, Telegram
+
+
+class TelegramInline(admin.StackedInline):
+    model = Telegram
+    can_delete = False
+    verbose_name_plural = 'telegram'
+
+
+class TelegramAdmin(BaseUserAdmin):
+    inlines = (TelegramInline,)
 
 
 class ContentAdmin(admin.ModelAdmin):
@@ -19,3 +31,6 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(Content, ContentAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.site_header = 'Панель бота Илона'
+
+admin.site.unregister(User_DJ)
+admin.site.register(User_DJ, TelegramAdmin)

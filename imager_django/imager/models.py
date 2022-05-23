@@ -1,7 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.html import mark_safe
 from .telegram_api import TelegramAPI
 import logging as log
+
+
+class Telegram(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tg_user_id = models.BigIntegerField("Telegram ID")
 
 
 class Content(models.Model):
