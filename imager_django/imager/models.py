@@ -27,8 +27,7 @@ class Content(models.Model):
         except Exception as e:
             log.debug(e)
             content = None
-        return mark_safe('<img src="/tg_api/%s" height="300vh"'
-                         ' onerror="this.onerror=null;this.src=\"https://http.cat/204\";" />' % content)
+        return mark_safe('<img src="/tg_api/%s" height="300vh" />' % content)
 
     media_tag.short_description = 'Превью'
 
