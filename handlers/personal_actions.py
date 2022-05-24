@@ -8,19 +8,12 @@ from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector
 from content.loader import LoaderContent
 from utils.throttling import rate_limit
-from asyncio import sleep
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
-@rate_limit(120, 'group_init')
+@rate_limit(60, 'group_init')
 async def group_handler(msg: types.Message):
     await msg.reply(dict_reply["group_answer"])
-
-
-@dp.message_handler(is_banned=True)
-@rate_limit(600, 'banned_user')
-async def send_banned_message(msg: types.Message):
-    await msg.answer(dict_reply["banned_user"])
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=[
@@ -49,12 +42,17 @@ async def init_load_content(msg: types.Message):
     await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
 
 
+@dp.message_handler(state=TakeContent.wait_content, is_banned=True)
+@rate_limit(2, 'banned_user')
+async def wait_content_user_banned(msg: types.Message):
+    await msg.reply(dict_reply["banned_user"])
+
+
 @dp.message_handler(content_types=[
     ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
 ], state=TakeContent.wait_content)
 async def wait_content_handler(msg: types.Message):
     await msg.reply(str(LoaderContent(msg)))
-    await sleep(0.5)
 
 
 @dp.message_handler(state=TakeContent.wait_content)
