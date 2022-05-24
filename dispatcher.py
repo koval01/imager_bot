@@ -18,7 +18,7 @@ if not config.BOT_TOKEN:
 # init
 storage = RedisStorage2(
     host=config.REDIS_URL["host"], port=config.REDIS_URL["port"],
-    password=config.REDIS_URL["password"], ssl=False, pool_size=100
+    password=config.REDIS_URL["password"], ssl=False, pool_size=20
 ) if config.REDIS_STORAGE else MemoryStorage()
 
 bot = Bot(token=config.BOT_TOKEN, parse_mode="HTML")

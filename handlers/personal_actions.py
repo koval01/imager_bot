@@ -5,9 +5,10 @@ from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent, TakeContent
-from content.selector import Selector, Manager
+from content.selector import Selector
 from content.loader import LoaderContent
 from utils.throttling import rate_limit
+from asyncio import sleep
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
@@ -53,6 +54,7 @@ async def init_load_content(msg: types.Message):
 ], state=TakeContent.wait_content)
 async def wait_content_handler(msg: types.Message):
     await msg.reply(str(LoaderContent(msg)))
+    await sleep(0.5)
 
 
 @dp.message_handler(state=TakeContent.wait_content)
