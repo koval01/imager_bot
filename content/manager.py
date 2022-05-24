@@ -76,7 +76,7 @@ class Manager:
     @property
     def _get_last_id(self) -> int:
         x = self.session.query(User).filter_by(
-            banned=False, user_id=self.user_id).all()
+            user_id=self.user_id).all()
         return eval(f"int(x[0].last_{self.type_content})")
 
     @property
