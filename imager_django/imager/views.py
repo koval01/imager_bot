@@ -1,7 +1,6 @@
 from django.http import StreamingHttpResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_page
 from requests import get as http_get
 from .telegram_api import TelegramAPI
 
@@ -13,7 +12,6 @@ def error_load(code: int) -> StreamingHttpResponse:
 
 @require_GET
 @login_required
-@cache_page(60 * 5)
 def get_image(request, file_type, file_name) -> StreamingHttpResponse:
     if file_type == "error":
         return error_load(code=int(file_name[:3]))
