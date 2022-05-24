@@ -12,6 +12,7 @@ django = "*"
 gunicorn = "*"
 whitenoise = "*"
 requests = "*"
+aiohttp = "*"
 
 [dev-packages]
 

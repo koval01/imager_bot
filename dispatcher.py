@@ -7,6 +7,7 @@ from static.filters import IsOwnerFilter, IsModeratorFilter, \
     IsAdminFilter, MemberCanRestrictFilter, IsBannedFilter
 from static import config
 from utils.throttling import ThrottlingMiddleware
+from utils.analytics import AnalyticsMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +26,7 @@ bot = Bot(token=config.BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
 dp.middleware.setup(ThrottlingMiddleware())
+dp.middleware.setup(AnalyticsMiddleware())
 
 # activate filters
 dp.filters_factory.bind(IsOwnerFilter)
