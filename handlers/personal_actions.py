@@ -42,7 +42,7 @@ async def init_load_content(msg: types.Message):
     await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
 
 
-@dp.message_handler(state=TakeContent.wait_content, is_banned=True)
+@dp.message_handler(content_types="*", state=TakeContent.wait_content, is_banned=True)
 @rate_limit(2, 'banned_user')
 async def wait_content_user_banned(msg: types.Message):
     await msg.reply(dict_reply["banned_user"])
@@ -55,7 +55,7 @@ async def wait_content_handler(msg: types.Message):
     await msg.reply(str(LoaderContent(msg)))
 
 
-@dp.message_handler(state=TakeContent.wait_content)
+@dp.message_handler(content_types="*", state=TakeContent.wait_content)
 async def wait_content_handler_invalid_type(msg: types.Message):
     await msg.reply(dict_reply["invalid_content_type"])
 
