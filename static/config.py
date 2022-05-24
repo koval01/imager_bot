@@ -5,10 +5,12 @@ pattern_redis = re.compile(r"redis:\/\/:(?P<password>[A-z0-9]*?)@(?P<host>[a-z0-
 
 BOT_TOKEN = getenv("BOT_TOKEN")
 BOT_OWNER = int(getenv("BOT_OWNER"))
+
 APP_DOMAIN = getenv("APP_DOMAIN")
-MODERATORS = list(map(int, getenv("MODERATORS").split()))
 DATABASE_URL = getenv("DATABASE_URL").replace("postgres://", "postgresql://")
+
 REDIS_URL = re.search(pattern_redis, getenv("REDIS_URL")).groupdict()
 REDIS_STORAGE = int(getenv("REDIS_STORAGE"))
+
 GA_ID = getenv("GA_ID")
 GA_SECRET = getenv("GA_SECRET")
