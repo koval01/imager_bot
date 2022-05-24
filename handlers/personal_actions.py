@@ -89,6 +89,6 @@ async def select_content(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler()
-@rate_limit(0.8, 'any_data')
+@rate_limit(0.5, 'any_data')
 async def any_messages(msg: types.Message):
     await msg.reply(dict_reply["unknown_answer"])
