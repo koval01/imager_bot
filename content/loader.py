@@ -51,6 +51,16 @@ class LoaderContent:
         return eval(f"self.message.{_type}.file_id")
 
     @property
+    def _check_file_size(self) -> bool:
+        _type = self._content_type
+        if _type == "photo":
+            return True
+        else:
+            _size = eval(f"self.message.{_type}.file_size")
+            return True if _size < 20971520 else False
+
+
+    @property
     def _write_content_to_database(self) -> bool:
         try:
             self.session.add(Content(
@@ -73,7 +83,11 @@ class LoaderContent:
                 if self._write_content_to_database else (
                     dict_reply["database_error_content"]
                     if self._allow_load
-                    else dict_reply["content_load_not_allowed"]
+                    else (
+                        dict_reply["content_load_not_allowed"]
+                        if self._check_file_size else
+                        dict_reply["big_size_file"]
+                    )
             )
         except Exception as e:
             log.error("Error add content. Details: %s" % e)
