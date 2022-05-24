@@ -36,14 +36,20 @@ async def init_select(msg: types.Message):
     await msg.reply(dict_reply["select_mode"], reply_markup=build_menu("select_mode"))
 
 
+# @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1], is_banned=True)
+# @rate_limit(1.5, 'banned_user_init_load_content')
+# async def banned_user_init_load_content(msg: types.Message):
+#     await msg.reply(dict_reply["banned_user"])
+
+
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1])
 async def init_load_content(msg: types.Message):
     await TakeContent.wait_content.set()
     await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
 
 
-@dp.message_handler(content_types="*", state=TakeContent.wait_content, is_banned=True)
-@rate_limit(2, 'banned_user')
+@dp.message_handler(content_types=["*"], state=TakeContent.wait_content, is_banned=True)
+@rate_limit(0.8, 'banned_user_try_load_content')
 async def wait_content_user_banned(msg: types.Message):
     await msg.reply(dict_reply["banned_user"])
 
