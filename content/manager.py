@@ -45,7 +45,8 @@ class Manager:
         user = self._get_user
         if not user:
             return True if self._add_user else False
-        elif user.tg_name_user != self.message.from_user.full_name:
+        elif (user.tg_name_user != self.message.from_user.full_name) \
+                or (user.tg_username_user != self.message.from_user.username):
             self._update_user_name
         return True
 
@@ -55,7 +56,10 @@ class Manager:
             self.session.query(User).filter_by(
                 user_id=self.user_id
             ).update(
-                {User.tg_name_user: self.message.from_user.full_name}
+                {
+                    User.tg_name_user: self.message.from_user.full_name,
+                    User.tg_username_user: f"@{self.message.from_user.username}"
+                }
             )
             self.session.commit()
         except Exception as e:
@@ -68,6 +72,7 @@ class Manager:
             self.session.add(User(
                 user_id=self.user_id,
                 tg_name_user=self.message.from_user.full_name,
+                tg_username_user=self.message.from_user.username,
                 banned=False,
                 last_photo=0,
                 last_video=0,
