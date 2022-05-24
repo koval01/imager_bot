@@ -48,7 +48,9 @@ async def init_load_content(msg: types.Message):
     await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
 
 
-@dp.message_handler(content_types=["*"], state=TakeContent.wait_content, is_banned=True)
+@dp.message_handler(content_types=[
+    ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
+], state=TakeContent.wait_content, is_banned=True)
 @rate_limit(0.8, 'banned_user_try_load_content')
 async def wait_content_user_banned(msg: types.Message):
     await msg.reply(dict_reply["banned_user"])
