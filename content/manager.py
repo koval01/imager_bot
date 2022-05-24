@@ -58,7 +58,7 @@ class Manager:
             ).update(
                 {
                     User.tg_name_user: self.message.from_user.full_name,
-                    User.tg_username_user: f"@{self.message.from_user.username}"
+                    User.tg_username_user: self.message.from_user.username
                 }
             )
             self.session.commit()
