@@ -3,7 +3,7 @@ import mimetypes
 import os
 import re
 
-from django.http import StreamingHttpResponse
+from django.http import HttpResponse
 from requests import get as http_get
 
 
@@ -55,15 +55,15 @@ class TelegramAPI:
             return response.json()["result"]
 
     @property
-    def get_file(self) -> StreamingHttpResponse:
+    def get_file(self) -> HttpResponse:
         media = http_get(
             'https://api.telegram.org/file/bot%s/%s' % (
                 os.getenv("BOT_TOKEN"), self.path
-            ), stream=True
+            )
         )
         type_data = Mime(self.path)
-        response_data = StreamingHttpResponse(
-            media.raw,
+        response_data = HttpResponse(
+            media.content,
             content_type=type_data,
             status=media.status_code,
             headers={
