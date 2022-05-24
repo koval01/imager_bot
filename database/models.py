@@ -75,3 +75,17 @@ class User(Base):
         self.last_photo = last_photo
         self.last_video = last_video
         self.last_voice = last_voice
+
+
+class Moderator(Base):
+    """Moderators list"""
+
+    __tablename__ = "imager_telegram"
+
+    id = Column(Integer, primary_key=True, index=True)
+    tg_user_id = Column(BigInteger, nullable=False, index=True, unique=True)
+    user_id = Column(Integer, nullable=False, index=True, unique=True)
+
+    def __init__(self, tg_user_id, user_id):
+        self.tg_user_id = tg_user_id
+        self.user_id = user_id

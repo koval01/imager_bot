@@ -1,4 +1,5 @@
 import logging
+import time
 
 from static.config import GA_ID, GA_SECRET
 from aiogram.types import Message
@@ -65,6 +66,13 @@ class Analytics:
 class AnalyticsMiddleware(BaseMiddleware):
     def __init__(self):
         super(AnalyticsMiddleware, self).__init__()
+
+    def check_timeout(self, obj):
+        start = obj.conf.get('_start', None)
+        if start:
+            del obj.conf['_start']
+            return round((time.time() - start) * 1000)
+        return -1
 
     async def on_process_message(self, message: Message, data: dict):
         handler = current_handler.get()

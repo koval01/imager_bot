@@ -29,11 +29,11 @@ class Content(models.Model):
 
     def media_tag(self):
         try:
-            content = TelegramAPI(str(self.file_id)).get["path"]
+            content = TelegramAPI(str(self.file_id))
         except Exception as e:
             log.debug(e)
             content = None
-        return mark_safe('<img src="/tg_api/%s" height="300vh" />' % content)
+        return mark_safe(content)
 
     media_tag.short_description = 'Превью'
 

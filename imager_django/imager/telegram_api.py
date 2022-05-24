@@ -1,9 +1,10 @@
-from requests import get as http_get
-from django.http import StreamingHttpResponse
 import logging as log
 import mimetypes
 import os
 import re
+
+from django.http import StreamingHttpResponse
+from requests import get as http_get
 
 
 class Mime:
@@ -71,7 +72,23 @@ class TelegramAPI:
         )
         return response_data
 
+    def _file_type(self, file_path: str) -> str:
+        return "video" if file_path[-3:] == "mp4" else (
+            "voice" if file_path[-3:] in ["ogg", "mp3"] else "photo"
+        )
+
+    def _html_view_build(self, data: dict) -> str:
+        return f'<video height="300vh" controls><source src="/tg_api/{data["path"]}" type="video/mp4">' \
+               'Ваш браузер не поддерживает видео тег.</video>' if data["type"] == "video" else (
+            f'<img src="/tg_api/{data["path"]}" height="300vh" />' if data["type"] == "photo"
+            else f'<audio controls><source src="/tg_api/{data["path"]}" type="audio/ogg">'
+                 f'Ваш браузер не поддерживает аудио элементы.</audio>'
+        )
+
     @property
-    def get(self) -> dict:
+    def get(self) -> str:
         path = self._get_file_data["file_path"]
-        return {"path": path}
+        return self._html_view_build({"path": path, "type": self._file_type(path)})
+
+    def __str__(self) -> str:
+        return self.get
