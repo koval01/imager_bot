@@ -23,7 +23,10 @@ class ContentAdmin(admin.ModelAdmin):
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'tg_name_user', 'banned', 'last_photo', 'last_video', 'last_voice')
+    list_display = (
+        'id', 'user_id', 'tg_name_user', 'tg_username_user',
+        'banned', 'last_photo', 'last_video', 'last_voice'
+    )
     list_filter = ('banned',)
     fields = [
         'user_id', 'tg_name_user', 'tg_username_user', 'banned',
