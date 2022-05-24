@@ -31,7 +31,7 @@ async def cancel_action(msg: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler(commands=['start', 'help'])
+@dp.message_handler(commands=['start', 'help'], state="*")
 @rate_limit(1, 'start_command')
 async def send_welcome(msg: types.Message):
     await msg.reply(dict_reply["start_message"], reply_markup=build_menu("start_menu"))
