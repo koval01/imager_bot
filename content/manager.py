@@ -33,7 +33,6 @@ class Manager:
                 user_id=self.user_id).one()
         except Exception as e:
             log.error("Error get user. Details: %s" % e)
-            self.check_user
 
     @property
     def check_ban(self) -> bool:
