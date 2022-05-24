@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User as User_DJ
+from django.contrib.admin.models import LogEntry
 from .models import Content, User, Telegram
 
 
@@ -34,3 +35,5 @@ admin.site.site_header = 'Панель бота Илона'
 
 admin.site.unregister(User_DJ)
 admin.site.register(User_DJ, TelegramAdmin)
+
+admin.site.register(LogEntry)
