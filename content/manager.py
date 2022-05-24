@@ -1,13 +1,15 @@
 from database.controller import session_factory
 from database.models import Content, User
+from aiogram.types import Message
 import logging as log
 
 
 class Manager:
-    def __init__(self, type_content: str = "photo", user_id: int = None) -> None:
+    def __init__(self, type_content: str = "photo", message: Message = None) -> None:
         self.session = session_factory()
         self.type_content = type_content
-        self.user_id = user_id
+        self.user_id = message.from_user.id
+        self.message = message
 
     def add_content(self, file_id: str) -> bool:
         try:
@@ -50,6 +52,7 @@ class Manager:
         try:
             self.session.add(User(
                 user_id=self.user_id,
+                tg_name_user=self.message.from_user.full_name,
                 banned=False,
                 last_photo=0,
                 last_video=0,

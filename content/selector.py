@@ -21,7 +21,7 @@ class Selector:
     async def reply(self) -> Message:
         try:
             type_ = self.select_type
-            data = str(Manager(type_content=type_, user_id=self.msg.from_user.id))
+            data = str(Manager(type_content=type_, message=self.msg))
             if not data:
                 await self.msg.reply(dict_reply["no_content"])
             else:

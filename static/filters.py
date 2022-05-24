@@ -41,7 +41,7 @@ class IsBannedFilter(BoundFilter):
         self.is_banned = is_banned
 
     async def check(self, message: types.Message):
-        return Manager(user_id=message.from_user.id).check_ban
+        return Manager(message=message).check_ban
 
 
 class IsAdminFilter(BoundFilter):

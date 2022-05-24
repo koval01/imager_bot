@@ -2,6 +2,7 @@ from aiogram import types
 from database.controller import session_factory
 from database.models import Content
 from static import config
+from utils.moderator import CheckModerator
 from static.messages import dictionary as dict_reply
 import logging as log
 
@@ -39,7 +40,7 @@ class LoaderContent:
     @property
     def _this_is_moderator(self) -> bool:
         user_id = self.message.from_user.id
-        return True if user_id in config.MODERATORS \
+        return True if CheckModerator.get \
                        or user_id == config.BOT_OWNER else False
 
     @property

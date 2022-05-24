@@ -48,6 +48,7 @@ class Content(models.Model):
 class User(models.Model):
     user_id = models.BigIntegerField("ID юзера", null=False, db_index=True, unique=True)
     banned = models.BooleanField("Забанен", help_text="Забанен ли юзер")
+    tg_name_user = models.CharField('Имя пользователя', null=False, max_length=255, default="Unknown")
     last_photo = models.BigIntegerField(
         "ID последнего фото", help_text="ID последнего полученного фото"
     )
