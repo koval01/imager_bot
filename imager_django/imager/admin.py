@@ -16,14 +16,14 @@ class TelegramAdmin(BaseUserAdmin):
 
 class ContentAdmin(admin.ModelAdmin):
     list_display = ('id', 'loader_id', 'type_content', 'moderated')
-    list_filter = ('loader_id', 'moderated', 'type_content')
+    list_filter = ('moderated', 'type_content')
     fields = ['media_tag', 'moderated', 'type_content', 'loader_id', 'file_id']
     readonly_fields = ['media_tag', 'type_content', 'loader_id', 'file_id']
 
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'banned', 'last_photo', 'last_video', 'last_voice')
-    list_filter = ('user_id', 'banned')
+    list_filter = ('banned',)
     fields = ['user_id', 'banned', 'last_photo', 'last_video', 'last_voice']
     readonly_fields = ['user_id', 'last_photo', 'last_video', 'last_voice']
 
