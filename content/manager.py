@@ -45,7 +45,22 @@ class Manager:
         user = self._get_user
         if not user:
             return True if self._add_user else False
+        elif user.tg_name_user != self.message.from_user.full_name:
+            self._update_user_name
         return True
+
+    @property
+    def _update_user_name(self) -> bool:
+        try:
+            self.session.query(User).filter_by(
+                user_id=self.user_id
+            ).update(
+                {User.tg_name_user: self.message.from_user.full_name}
+            )
+            self.session.commit()
+        except Exception as e:
+            log.warning("Error update user name. Details %s" % e)
+            return False
 
     @property
     def _add_user(self) -> bool:
