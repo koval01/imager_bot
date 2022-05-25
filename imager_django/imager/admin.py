@@ -39,12 +39,9 @@ class UserAdmin(admin.ModelAdmin):
 
 
 class LogEntryAdmin(admin.ModelAdmin):
-    fields = [
-        'action_time', 'object_id', 'object_repr',
-        'action_flag', 'change_message', 'content_type_id', 'user_id'
-    ]
-    readonly_fields = fields[:]
-    list_filter = ('action_flag', 'user_id', 'content_type_id',)
+    list_display = ('action_time', 'user', 'content_type', 'object_repr', 'change_message', 'action_flag')
+    list_filter = ['action_time', 'user', 'content_type']
+    ordering = ('-action_time',)
 
 
 admin.site.register(Content, ContentAdmin)
