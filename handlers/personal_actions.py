@@ -52,7 +52,7 @@ async def init_load_content(msg: types.Message):
 @dp.message_handler(content_types=[
     ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
 ], state=TakeContent.wait_content, is_banned=True)
-@rate_limit(0.8, 'banned_user_try_load_content')
+@rate_limit(1, 'banned_user_try_load_content')
 async def wait_content_user_banned(msg: types.Message):
     await msg.reply(dict_reply["banned_user"])
 
@@ -78,13 +78,13 @@ async def wait_content_handler_invalid_type(msg: types.Message):
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["select_mode"], state=ViewContent.select_mode)
-@rate_limit(0.8, 'error_select_content_type')
+@rate_limit(0.6, 'error_select_content_type')
 async def invalid_select_content(msg: types.Message):
     await msg.reply(dict_reply["error_select"], reply_markup=build_menu("select_mode"))
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["next_content"], state=ViewContent.view_mode)
-@rate_limit(0.8, 'error_select_content_action')
+@rate_limit(0.6, 'error_select_content_action')
 async def invalid_select_action(msg: types.Message):
     await msg.reply(dict_reply["error_action"], reply_markup=build_menu("next_content"))
 
