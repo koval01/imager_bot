@@ -65,7 +65,7 @@ async def wait_content_handler(msg: types.Message):
     if response_status != dict_reply["content_success"]:
         await msg.reply(response_status)
     try:
-        await dp.throttle('start', rate=0.2)
+        await dp.throttle('start', rate=1)
     except Throttled:
         pass
     else:
