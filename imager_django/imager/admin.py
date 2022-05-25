@@ -51,7 +51,11 @@ class LogEntryAdmin(admin.ModelAdmin):
     ordering = ('-action_time',)
 
     def change_msg(self, instance):
-        return json.dumps(json.loads(instance.change_message), indent=3, sort_keys=True)
+        try:
+            return json.dumps(json.loads(instance.change_message), indent=3, sort_keys=True)
+        except Exception as e:
+            log.error("Error parsing change_message. Details: %s" % e)
+            return "Error parsing"
 
 
 admin.site.register(Content, ContentAdmin)
