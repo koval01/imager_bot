@@ -63,7 +63,7 @@ async def wait_content_user_banned(msg: types.Message):
 async def wait_content_handler(msg: types.Message):
     response_status = str(LoaderContent(msg))
     if response_status != dict_reply["content_success"]:
-        await msg.reply(response_status)
+        return await msg.reply(response_status)
     try:
         await dp.throttle('start', rate=1)
     except Throttled:
