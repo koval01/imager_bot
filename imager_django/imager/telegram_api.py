@@ -74,7 +74,7 @@ class TelegramAPI:
 
     def _file_type(self, file_path: str) -> str:
         return "video" if file_path[-3:].lower() == "mp4" else (
-            "voice" if file_path[-3:].lower() in ["ogg", "mp3"] else "photo"
+            "voice" if file_path[-3:].lower() in ["ogg", "mp3", "oga", "avi"] else "photo"
         )
 
     def _html_view_build(self, data: dict) -> str:
