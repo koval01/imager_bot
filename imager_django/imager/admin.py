@@ -38,6 +38,15 @@ class UserAdmin(admin.ModelAdmin):
     ]
 
 
+class LogEntryAdmin(admin.ModelAdmin):
+    fields = [
+        'action_time', 'object_id', 'object_repr',
+        'action_flag', 'change_message', 'content_type_id', 'user_id'
+    ]
+    readonly_fields = fields[:]
+    list_filter = ('action_flag', 'user_id', 'content_type_id',)
+
+
 admin.site.register(Content, ContentAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.site_header = 'Панель бота Илона'
@@ -45,4 +54,4 @@ admin.site.site_header = 'Панель бота Илона'
 admin.site.unregister(User_DJ)
 admin.site.register(User_DJ, TelegramAdmin)
 
-admin.site.register(LogEntry)
+admin.site.register(LogEntry, LogEntryAdmin)
