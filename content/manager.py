@@ -46,19 +46,21 @@ class Manager:
         if not user:
             return True if self._add_user else False
         elif (user.tg_name_user != self.message.from_user.full_name) \
-                or (user.tg_username_user != self.message.from_user.username):
+                or (user.tg_username_user != self.message.from_user.username and (
+                self.message.from_user.username)):
             self._update_user_name
         return True
 
     @property
     def _update_user_name(self) -> bool:
         try:
+            username = self.message.from_user.username
             self.session.query(User).filter_by(
                 user_id=self.user_id
             ).update(
                 {
                     User.tg_name_user: self.message.from_user.full_name,
-                    User.tg_username_user: self.message.from_user.username
+                    User.tg_username_user: username if username else "N/A"
                 }
             )
             self.session.commit()
