@@ -1,5 +1,4 @@
-import logging
-import time
+import logging as log
 
 from static.config import GA_ID, GA_SECRET
 from aiogram.types import Message
@@ -7,6 +6,7 @@ from aiogram import Dispatcher
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler import current_handler
 from aiohttp import ClientSession
+from content.manager import Manager
 
 
 class Analytics:
@@ -27,12 +27,12 @@ class Analytics:
                         f"https://{self.host}/{self.path}", json=json, params=params
                 ) as response:
                     if response.status >= 200 < 300:
-                        logging.debug("OK code Google Analytics")
+                        log.debug("OK code Google Analytics")
                     else:
-                        logging.warning(f"Error code Google Analytics: {response.status}. "
+                        log.warning(f"Error code Google Analytics: {response.status}. "
                                         f"Detail response: {response.text[:512]}")
             except Exception as e:
-                logging.error(
+                log.error(
                     f"Error sending request to Google Analytics. "
                     f"Error name: {e.__class__.__name__}. Error details: {e}"
                 )
@@ -67,14 +67,9 @@ class AnalyticsMiddleware(BaseMiddleware):
     def __init__(self):
         super(AnalyticsMiddleware, self).__init__()
 
-    def check_timeout(self, obj):
-        start = obj.conf.get('_start', None)
-        if start:
-            del obj.conf['_start']
-            return round((time.time() - start) * 1000)
-        return -1
-
     async def on_process_message(self, message: Message, data: dict):
+        user_check = Manager(message=message).check_user
+        log.debug("Error check user.") if not user_check else None
         handler = current_handler.get()
         dispatcher = Dispatcher.get_current()
         _debug_data = [handler.__name__, dispatcher, message, data]

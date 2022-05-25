@@ -46,7 +46,7 @@ class Manager:
         if not user:
             return True if self._add_user else False
         elif (user.tg_name_user != self.message.from_user.full_name) \
-                and (user.tg_username_user != self.message.from_user.username):
+                or (user.tg_username_user != self.message.from_user.username):
             self._update_user_name
         return True
 
