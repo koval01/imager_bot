@@ -53,7 +53,7 @@ class LogEntryAdmin(admin.ModelAdmin):
     def change_msg(self, instance):
         json_body = json.loads(instance.change_message)
         try:
-            return "\n".join([
+            return ",\x20".join([
                 f.encode("utf-8").decode("utf-8")
                 for f in json_body[0][
                     [i[0] for i in json_body[0].items()][0]
