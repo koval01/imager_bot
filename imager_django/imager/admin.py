@@ -41,7 +41,7 @@ class UserAdmin(admin.ModelAdmin):
 class LogEntryAdmin(admin.ModelAdmin):
     list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
     list_filter = ['action_time', 'user', 'content_type', 'action_flag']
-    fields = ['action_time', 'user', 'content_type', 'object_repr', 'action_flag']
+    fields = ['action_time', 'user', 'content_type', 'object_repr', 'action_flag', 'objects', 'object_id']
     readonly_fields = fields[:]
     ordering = ('-action_time',)
 
