@@ -79,16 +79,16 @@ class LoaderContent:
     @property
     def add_content(self) -> str:
         try:
-            return dict_reply["content_success"] \
-                if self._write_content_to_database else (
-                    dict_reply["database_error_content"]
-                    if self._allow_load
-                    else (
-                        dict_reply["content_load_not_allowed"]
-                        if self._check_file_size else
-                        dict_reply["big_size_file"]
-                    )
-            )
+            if not self._check_file_size:
+                return dict_reply["big_size_file"]
+
+            if not self._allow_load:
+                return dict_reply["content_load_not_allowed"]
+
+            if not self._write_content_to_database:
+                return dict_reply["database_error_content"]
+
+            return dict_reply["content_success"]
         except Exception as e:
             log.error("Error add content. Details: %s" % e)
             return dict_reply["internal_error"] % e.__class__.__name__
