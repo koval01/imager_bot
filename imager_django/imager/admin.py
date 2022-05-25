@@ -53,15 +53,17 @@ class LogEntryAdmin(admin.ModelAdmin):
     def change_msg(self, instance):
         json_body = json.loads(instance.change_message)
         try:
-            return "\n-\x20".join([
+            return "\n".join([
                 f.encode("utf-8").decode("utf-8")
-                for f in json_body[
+                for f in json_body[0][
                     [i[0] for i in json_body[0].items()][0]
                 ]["fields"]
-            ]).strip()
+            ])
         except Exception as e:
             log.debug("Error parsing change_message. Details: %s" % e)
             return "N/A"
+
+    change_msg.__name__ = "Задействованные поля"
 
 
 admin.site.register(Content, ContentAdmin)
