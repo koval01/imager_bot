@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User as User_DJ
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
+from django.contrib.admin.models import LogEntry
 from .models import Content, User, Telegram
+import logging as log
+import json
 
 
 class TelegramInline(admin.StackedInline):
@@ -41,9 +43,15 @@ class UserAdmin(admin.ModelAdmin):
 class LogEntryAdmin(admin.ModelAdmin):
     list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
     list_filter = ['action_time', 'user', 'content_type', 'action_flag']
-    fields = ['action_time', 'user', 'content_type', 'object_repr', 'action_flag', 'objects', 'object_id']
+    fields = [
+        'action_time', 'user', 'content_type', 'change_msg',
+        'object_repr', 'action_flag', 'object_id'
+    ]
     readonly_fields = fields[:]
     ordering = ('-action_time',)
+
+    def change_msg(self, instance):
+        return json.dumps(json.loads(instance.change_message), indent=3, sort_keys=True)
 
 
 admin.site.register(Content, ContentAdmin)
