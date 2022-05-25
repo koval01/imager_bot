@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.types import ChatType, ContentType
 from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import Throttled
 from dispatcher import dp
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
@@ -60,7 +61,15 @@ async def wait_content_user_banned(msg: types.Message):
     ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
 ], state=TakeContent.wait_content)
 async def wait_content_handler(msg: types.Message):
-    await msg.answer(str(LoaderContent(msg)))
+    response_status = str(LoaderContent(msg))
+    if response_status != dict_reply["content_success"]:
+        await msg.reply(response_status)
+    try:
+        await dp.throttle('start', rate=0.2)
+    except Throttled:
+        pass
+    else:
+        await msg.answer(response_status)
 
 
 @dp.message_handler(content_types="*", state=TakeContent.wait_content)
