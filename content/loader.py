@@ -40,7 +40,7 @@ class LoaderContent:
     @property
     def _this_is_moderator(self) -> bool:
         user_id = self.message.from_user.id
-        return True if CheckModerator.get \
+        return True if CheckModerator(self.message).get \
                        or user_id == config.BOT_OWNER else False
 
     @property
