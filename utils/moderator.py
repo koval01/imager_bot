@@ -16,4 +16,4 @@ class CheckModerator:
 
     @property
     def get(self) -> bool:
-        return self._check_user
+        return bool(self._check_user)
