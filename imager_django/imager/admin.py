@@ -68,7 +68,8 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 admin.site.register(Content, ContentAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.site_header = 'Панель бота Илона'
+admin.site.site_header = 'Imager'
+admin.site.site_title = "Панель администратора"
 
 admin.site.unregister(User_DJ)
 admin.site.register(User_DJ, TelegramAdmin)
