@@ -52,7 +52,9 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     def change_msg(self, instance):
         try:
-            return json.dumps(json.loads(instance.change_message), indent=3, sort_keys=True)
+            return json.dumps(
+                json.loads(instance.change_message), indent=3, sort_keys=True
+            ).encode("ascii").decode("utf-8")
         except Exception as e:
             log.error("Error parsing change_message. Details: %s" % e)
             return "Error parsing"
