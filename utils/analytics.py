@@ -67,10 +67,13 @@ class AnalyticsMiddleware(BaseMiddleware):
     def __init__(self):
         super(AnalyticsMiddleware, self).__init__()
 
-    async def on_process_message(self, message: Message, data: dict):
+    async def _update_user(self, message: Message) -> None:
         user_check = Manager(message=message).check_user
         log.debug("Error check user.") if not user_check else None
+
+    async def on_process_message(self, message: Message, data: dict):
         handler = current_handler.get()
         dispatcher = Dispatcher.get_current()
         _debug_data = [handler.__name__, dispatcher, message, data]
+        await self._update_user(message)
         await Analytics(message=message, alt_action=handler.__name__).send
