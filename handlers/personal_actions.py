@@ -77,7 +77,7 @@ async def wait_content_handler_file(msg: types.Message):
     await msg.reply(dict_reply["content_is_file"])
 
 
-@dp.message_handler(content_types="*", state=TakeContent.wait_content)
+@dp.message_handler(content_types=ContentType.ANY, state=TakeContent.wait_content)
 async def wait_content_handler_invalid_type(msg: types.Message):
     await msg.reply(dict_reply["invalid_content_type"])
 
