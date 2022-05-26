@@ -43,12 +43,21 @@ class LoaderContent:
         return True if CheckModerator(self.message).get \
                        or user_id == config.BOT_OWNER else False
 
+    def _video_note_check(self, current_type: str) -> str:
+        try:
+            _ = self.message.video_note
+            return "video_note"
+        except Exception as e:
+            log.debug("%s is not video_note. Details: %s" % (
+                self._check_file_size.__name__, e))
+            return current_type
+
     @property
     def _get_file_id(self) -> str:
         _type = self._content_type
         if _type == "photo":
             return self.message.photo[-1:][0].file_id
-        return eval(f"self.message.{_type}.file_id")
+        return eval(f"self.message.{self._video_note_check(_type)}.file_id")
 
     @property
     def _check_file_size(self) -> bool:
@@ -56,13 +65,7 @@ class LoaderContent:
         if _type == "photo":
             return True
         else:
-            try:
-                _ = self.message.video_note
-                _type = "video_note"
-            except Exception as e:
-                log.debug("%s is not video_note. Details: %s" % (
-                    self._check_file_size.__name__, e))
-            _size = eval(f"self.message.{_type}.file_size")
+            _size = eval(f"self.message.{self._video_note_check(_type)}.file_size")
             return True if _size < 20971520 else False
 
 
