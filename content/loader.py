@@ -56,6 +56,12 @@ class LoaderContent:
         if _type == "photo":
             return True
         else:
+            try:
+                _ = self.message.video_note
+                _type = "video_note"
+            except Exception as e:
+                log.debug("%s is not video_note. Details: %s" % (
+                    self._check_file_size.__name__, e))
             _size = eval(f"self.message.{_type}.file_size")
             return True if _size < 20971520 else False
 
