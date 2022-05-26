@@ -45,12 +45,12 @@ class LoaderContent:
 
     def _video_note_check(self, current_type: str) -> str:
         try:
-            _ = self.message.video_note
-            return "video_note"
+            if self.message.video_note:
+                return "video_note"
         except Exception as e:
             log.debug("%s is not video_note. Details: %s" % (
                 self._check_file_size.__name__, e))
-            return current_type
+        return current_type
 
     @property
     def _get_file_id(self) -> str:
