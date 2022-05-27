@@ -17,6 +17,12 @@ async def group_handler(msg: types.Message):
     await msg.reply(dict_reply["group_answer"])
 
 
+@dp.message_handler(is_full_banned=True)
+@rate_limit(2, 'full_banned_user')
+async def full_banned_user(msg: types.Message):
+    await msg.reply(dict_reply["full_ban"])
+
+
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][0], state=[
     ViewContent.view_mode, TakeContent.wait_content
 ])

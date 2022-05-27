@@ -67,15 +67,17 @@ class User(Base):
     tg_name_user = Column(String(255), default="Unknown", nullable=False)
     tg_username_user = Column(String(255), default="@Unknown", nullable=False)
     banned = Column(Boolean)
+    full_banned = Column(Boolean)
     last_photo = Column(BigInteger)
     last_video = Column(BigInteger)
     last_voice = Column(BigInteger)
 
-    def __init__(self, user_id, tg_name_user, tg_username_user, banned, last_photo, last_video, last_voice):
+    def __init__(self, user_id, tg_name_user, tg_username_user, banned, full_banned, last_photo, last_video, last_voice):
         self.user_id = user_id
         self.tg_name_user = tg_name_user
         self.tg_username_user = tg_username_user
         self.banned = banned
+        self.full_banned = full_banned
         self.last_photo = last_photo
         self.last_video = last_video
         self.last_voice = last_voice

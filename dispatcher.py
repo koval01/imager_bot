@@ -4,7 +4,8 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from static.filters import IsOwnerFilter, IsModeratorFilter, \
-    IsAdminFilter, MemberCanRestrictFilter, IsBannedFilter
+    IsAdminFilter, MemberCanRestrictFilter, IsBannedFilter, \
+    IsFullBannedFilter
 from static import config
 from utils.throttling import ThrottlingMiddleware
 from utils.analytics import AnalyticsMiddleware
@@ -32,5 +33,6 @@ dp.middleware.setup(AnalyticsMiddleware())
 dp.filters_factory.bind(IsOwnerFilter)
 dp.filters_factory.bind(IsModeratorFilter)
 dp.filters_factory.bind(IsBannedFilter)
+dp.filters_factory.bind(IsFullBannedFilter)
 dp.filters_factory.bind(IsAdminFilter)
 dp.filters_factory.bind(MemberCanRestrictFilter)

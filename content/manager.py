@@ -41,6 +41,12 @@ class Manager:
         return False
 
     @property
+    def check_full_ban(self) -> bool:
+        if self.check_user:
+            return True if self._get_user.full_banned else False
+        return False
+
+    @property
     def check_user(self) -> bool:
         user = self._get_user
         if not user:
@@ -76,6 +82,7 @@ class Manager:
                 tg_name_user=self.message.from_user.full_name,
                 tg_username_user=self.message.from_user.username,
                 banned=False,
+                full_banned=False,
                 last_photo=0,
                 last_video=0,
                 last_voice=0

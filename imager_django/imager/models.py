@@ -47,7 +47,8 @@ class Content(models.Model):
 
 class User(models.Model):
     user_id = models.BigIntegerField("ID юзера", null=False, db_index=True, unique=True)
-    banned = models.BooleanField("Забанен", help_text="Забанен ли юзер")
+    banned = models.BooleanField("Забанен", help_text="Забанен ли юзер", default=False)
+    full_banned = models.BooleanField("Полностью забанен", help_text="Закрыть доступ к боту", default=False)
     tg_name_user = models.CharField('Имя пользователя', null=False, max_length=255, default="Unknown")
     tg_username_user = models.CharField('Юзернейм пользователя', null=False, max_length=255, default="@Unknown")
     last_photo = models.BigIntegerField(
@@ -61,7 +62,7 @@ class User(models.Model):
     )
 
     def __str__(self):
-        return "%s (Забанен: %s)" % (self.user_id, self.banned)
+        return "%s (Забанен: %s)" % (self.user_id, self.full_banned)
 
     class Meta:
         verbose_name = 'Пользователь'
