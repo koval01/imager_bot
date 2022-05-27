@@ -27,12 +27,12 @@ class ContentAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'user_id', 'tg_name_user', 'tg_username_user',
-        'banned', 'last_photo', 'last_video', 'last_voice'
+        'banned', 'full_banned', 'last_photo', 'last_video', 'last_voice'
     )
-    list_filter = ('banned',)
+    list_filter = ('banned', 'full_banned')
     fields = [
         'user_id', 'tg_name_user', 'tg_username_user', 'banned',
-        'last_photo', 'last_video', 'last_voice'
+        'full_banned', 'last_photo', 'last_video', 'last_voice'
     ]
     readonly_fields = [
         'user_id', 'tg_name_user', 'tg_username_user',
