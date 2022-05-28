@@ -8,7 +8,7 @@ import logging as log
 class Logger:
     def __init__(
             self, level: Literal["info", "warning", "error"],
-            exception: dict[Literal["name"]: str, Literal["details"]: str, Literal["function"]: str]
+            exception: dict
     ) -> None:
         self.log_level = level
         self.exception = exception
@@ -22,7 +22,8 @@ class Logger:
         try:
             response = http_get(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", params={
                 "chat_id": chat_id,
-                "text": message
+                "text": message,
+                "parse_mode": "HTML"
             })
             return True if response.status_code == 200 else False
         except Exception as e:
@@ -32,7 +33,7 @@ class Logger:
     @property
     def _python_log(self) -> log:
         log_msg = "%s: %s" % (self.exception["name"], self.exception["details"])
-        return eval("log.%s(%s)" % (self.log_level, log_msg))
+        return eval("log.%s(log_msg)" % self.log_level)
 
     @property
     def _send_log(self) -> bool:
@@ -50,5 +51,9 @@ class Logger:
     def _build_pattern(self) -> str:
         return f"TRACE\n{'-'*10}\nLEVEL:\x20{self.log_level}\n" \
                f"In:\x20<code>{self.exception['function']}</code>\n" \
-               f"<code>{self.exception['name']}</code>\n" \
-               f"<code>{self.exception['details']}</code>"
+               f"Class:\x20<code>{self.exception['name']}</code>\n" \
+               f"{self.exception['details']}"
+
+    @property
+    def send(self) -> _send_log:
+        return self._send_log
