@@ -34,4 +34,4 @@ class Selector:
             await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self.reply_selector.__name__
-            }).send
+            }).send()

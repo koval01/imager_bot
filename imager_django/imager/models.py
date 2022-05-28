@@ -33,7 +33,7 @@ class Content(models.Model):
         except Exception as e:
             Logger("info", {
                 "name": e.__class__.__name__, "details": e, "function": self.media_tag.__name__
-            }).send
+            }).send()
             content = None
         return mark_safe(content)
 

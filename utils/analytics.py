@@ -35,7 +35,7 @@ class Analytics:
             except Exception as e:
                 Logger("error", {
                     "name": e.__class__.__name__, "details": e, "function": self._request_ga_server.__name__
-                }).send
+                }).send()
 
     @property
     def _build_payload(self) -> dict:

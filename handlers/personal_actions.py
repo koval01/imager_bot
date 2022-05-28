@@ -44,7 +44,7 @@ async def test_log_handler(msg: types.Message):
     Logger("info", {
         "name": "TestLogHandler", "details": "This log was called by administrator.",
         "function": test_log_handler.__name__
-    }).send
+    }).send()
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
