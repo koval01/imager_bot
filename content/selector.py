@@ -2,6 +2,7 @@ from static.menu import dictionary as menu_dict
 from static.messages import dictionary as dict_reply
 from aiogram.types import Message
 from content.manager import Manager
+from utils.logger import Logger
 
 
 class Selector:
@@ -18,7 +19,7 @@ class Selector:
         ][0]
 
     @property
-    async def reply(self) -> Message:
+    async def reply_selector(self) -> Message:
         try:
             type_ = self.select_type
             data = str(Manager(type_content=type_, message=self.msg))
@@ -28,3 +29,6 @@ class Selector:
                 await eval(f"self.msg.reply_{type_}(data, reply_markup=build_menu(\"next_content\"))")
         except Exception as e:
             await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self.reply_selector.__name__
+            }).send

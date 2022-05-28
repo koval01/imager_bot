@@ -115,7 +115,7 @@ async def invalid_select_action(msg: types.Message):
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
-        await Selector(msg).reply
+        await Selector(msg).reply_selector
 
 
 @dp.message_handler(lambda message: message.text in dict_menu["select_mode"], state=ViewContent.select_mode)
@@ -123,7 +123,7 @@ async def select_content(msg: types.Message, state: FSMContext):
     await ViewContent.next()
     await state.update_data(select=msg.text)
     await msg.reply(dict_reply["view_content"], reply_markup=build_menu("next_content"))
-    await Selector(msg).reply
+    await Selector(msg).reply_selector
 
 
 @dp.message_handler()
