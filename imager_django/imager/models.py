@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.html import mark_safe
 from .telegram_api import TelegramAPI
-import logging as log
+from utils.logger import Logger
 
 
 class Telegram(models.Model):
@@ -31,7 +31,9 @@ class Content(models.Model):
         try:
             content = TelegramAPI(str(self.file_id))
         except Exception as e:
-            log.debug(e)
+            Logger("info", {
+                "name": e.__class__.__name__, "details": e, "function": self.media_tag.__name__
+            })
             content = None
         return mark_safe(content)
 

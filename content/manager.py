@@ -1,7 +1,7 @@
 from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
-import logging as log
+from utils.logger import Logger
 
 
 class Manager:
@@ -22,8 +22,9 @@ class Manager:
             self.session.close()
             return True
         except Exception as e:
-            log.error("Error database (%s). Details: %s" % (
-                self.add_content.__name__, e))
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
+            })
             return False
 
     @property
@@ -32,7 +33,9 @@ class Manager:
             return self.session.query(User).filter_by(
                 user_id=self.user_id).one()
         except Exception as e:
-            log.error("Error get user. Details: %s" % e)
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self._get_user.__name__
+            })
 
     @property
     def check_ban(self) -> bool:
@@ -71,7 +74,9 @@ class Manager:
             )
             self.session.commit()
         except Exception as e:
-            log.warning("Error update user name. Details %s" % e)
+            Logger("warning", {
+                "name": e.__class__.__name__, "details": e, "function": self._update_user_name.__name__
+            })
             return False
 
     @property
@@ -91,8 +96,9 @@ class Manager:
             self.session.close()
             return True
         except Exception as e:
-            log.error("Error database (%s). Details: %s" % (
-                self._add_user.__name__, e))
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self._add_user.__name__
+            })
             return False
 
     @property
@@ -122,7 +128,9 @@ class Manager:
             self.session.commit()
             return True
         except Exception as e:
-            log.error("Error in %s. Details: %s" % (self._update_last_id_content.__name__, e))
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self._update_last_id_content.__name__
+            })
             return False
 
     def __str__(self) -> str:

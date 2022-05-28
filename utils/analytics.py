@@ -1,3 +1,4 @@
+from utils.logger import Logger
 import logging as log
 
 from static.config import GA_ID, GA_SECRET
@@ -20,7 +21,7 @@ class Analytics:
         self.host = "www.google-analytics.com"
         self.path = "mp/collect"
 
-    async def _request(self, params: dict, json: dict) -> None:
+    async def _request_ga_server(self, params: dict, json: dict) -> None:
         async with ClientSession() as session:
             try:
                 async with session.post(
@@ -30,12 +31,11 @@ class Analytics:
                         log.debug("OK code Google Analytics")
                     else:
                         log.warning(f"Error code Google Analytics: {response.status}. "
-                                        f"Detail response: {response.text[:512]}")
+                                    f"Detail response: {response.text[:512]}")
             except Exception as e:
-                log.error(
-                    f"Error sending request to Google Analytics. "
-                    f"Error name: {e.__class__.__name__}. Error details: {e}"
-                )
+                Logger("error", {
+                    "name": e.__class__.__name__, "details": e, "function": self._request_ga_server.__name__
+                })
 
     @property
     def _build_payload(self) -> dict:
@@ -54,8 +54,8 @@ class Analytics:
         }
 
     @property
-    async def send(self) -> None:
-        await self._request({
+    async def send(self) -> _request_ga_server:
+        return await self._request_ga_server({
             "measurement_id": self.id, "api_secret": self.secret
         }, self._build_payload)
 
@@ -67,7 +67,8 @@ class AnalyticsMiddleware(BaseMiddleware):
     def __init__(self):
         super(AnalyticsMiddleware, self).__init__()
 
-    async def _update_user(self, message: Message) -> None:
+    @staticmethod
+    async def _update_user(message: Message) -> None:
         user_check = Manager(message=message).check_user
         log.debug("Error check user.") if not user_check else None
 

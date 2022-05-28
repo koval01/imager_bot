@@ -4,7 +4,7 @@ from database.models import Content
 from static import config
 from utils.moderator import CheckModerator
 from static.messages import dictionary as dict_reply
-import logging as log
+from utils.logger import Logger
 
 
 class LoaderContent:
@@ -22,7 +22,9 @@ class LoaderContent:
                 if t == _type
             ][0]
         except Exception as e:
-            log.error("Error detect content type. Details: %s" % e)
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self._content_type.__name__
+            })
             return ""
 
     @property
@@ -48,8 +50,9 @@ class LoaderContent:
             if self.message.video_note:
                 return "video_note"
         except Exception as e:
-            log.debug("%s is not video_note. Details: %s" % (
-                self._check_file_size.__name__, e))
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self._video_note_check.__name__
+            })
         return current_type
 
     @property
@@ -82,7 +85,9 @@ class LoaderContent:
             self.session.close()
             return True
         except Exception as e:
-            log.error("Error write content to database. Details: %s" % e)
+            Logger("error", {
+                "name": e.__class__.__name__, "details": e, "function": self._write_content_to_database.__name__
+            })
             return False
 
     @property
@@ -99,7 +104,9 @@ class LoaderContent:
 
             return dict_reply["content_success"]
         except Exception as e:
-            log.error("Error add content. Details: %s" % e)
+            Logger("warning", {
+                "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
+            })
             return dict_reply["internal_error"] % e.__class__.__name__
 
     def __str__(self) -> str:

@@ -9,6 +9,7 @@ from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector
 from content.loader import LoaderContent
 from utils.throttling import rate_limit
+from utils.logger import Logger
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
@@ -35,6 +36,15 @@ async def cancel_action(msg: types.Message, state: FSMContext):
 @rate_limit(1, 'start_command')
 async def send_welcome(msg: types.Message):
     await msg.reply(dict_reply["start_message"], reply_markup=build_menu("start_menu"))
+
+
+@dp.message_handler(commands=['test_log'], state="*", is_owner=True)
+async def test_log_handler(msg: types.Message):
+    await msg.reply(dict_reply["test_log_reply"])
+    Logger("info", {
+        "name": "TestLogHandler", "details": "This log was called by administrator.",
+        "function": test_log_handler.__name__
+    })
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])

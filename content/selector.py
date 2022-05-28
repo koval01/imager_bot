@@ -1,4 +1,4 @@
-from static.menu import build_menu, dictionary as menu_dict
+from static.menu import dictionary as menu_dict
 from static.messages import dictionary as dict_reply
 from aiogram.types import Message
 from content.manager import Manager
