@@ -56,6 +56,5 @@ class Logger:
                f"Class:\x20<code>{self.exception['name']}</code>\n" \
                f"Description:\x20\"{self.exception['details']}\""
 
-    @property
-    def send(self) -> None:
-        self._send_log
+    def send(self) -> _send_log:
+        return self._send_log

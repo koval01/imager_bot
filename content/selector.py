@@ -22,13 +22,16 @@ class Selector:
     async def reply_selector(self) -> Message:
         try:
             type_ = self.select_type
-            data = str(Manager(type_content=type_, message=self.msg))
-            if not data:
+            content_id, file_id = Manager(type_content=type_, message=self.msg).get_content
+            if not content_id or not file_id:
                 await self.msg.reply(dict_reply["no_content"])
             else:
-                await eval(f"self.msg.reply_{type_}(data, reply_markup=build_menu(\"next_content\"))")
+                await eval(
+                    f"self.msg.reply_{type_}(data, "
+                    f"caption=str(content_id) reply_markup=build_menu(\"next_content\"))"
+                )
         except Exception as e:
             await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self.reply_selector.__name__
-            }).send
+            }).send()

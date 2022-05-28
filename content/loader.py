@@ -24,7 +24,7 @@ class LoaderContent:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._content_type.__name__
-            }).send
+            }).send()
             return ""
 
     @property
@@ -52,7 +52,7 @@ class LoaderContent:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._video_note_check.__name__
-            }).send
+            }).send()
         return current_type
 
     @property
@@ -87,7 +87,7 @@ class LoaderContent:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._write_content_to_database.__name__
-            }).send
+            }).send()
             return False
 
     @property
@@ -106,7 +106,7 @@ class LoaderContent:
         except Exception as e:
             Logger("warning", {
                 "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
-            }).send
+            }).send()
             return dict_reply["internal_error"] % e.__class__.__name__
 
     def __str__(self) -> str:

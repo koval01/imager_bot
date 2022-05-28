@@ -24,7 +24,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
-            }).send
+            }).send()
             return False
 
     @property
@@ -35,7 +35,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._get_user.__name__
-            }).send
+            }).send()
 
     @property
     def check_ban(self) -> bool:
@@ -76,7 +76,7 @@ class Manager:
         except Exception as e:
             Logger("warning", {
                 "name": e.__class__.__name__, "details": e, "function": self._update_user_name.__name__
-            }).send
+            }).send()
             return False
 
     @property
@@ -98,7 +98,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._add_user.__name__
-            }).send
+            }).send()
             return False
 
     @property
@@ -111,7 +111,7 @@ class Manager:
         except IndexError:
             return ""
         return "" if not self._update_last_id_content \
-            else (x[l].file_id if x.count() else "")
+            else ((x[l].id, x[l].file_id) if x.count() else "")
 
     @property
     def _get_last_id(self) -> int:
@@ -132,8 +132,13 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._update_last_id_content.__name__
-            }).send
+            }).send()
             return False
+
+    @property
+    def get_content(self) -> tuple:
+        data = self.get_content
+        return data if type(data) == "tuple" else (None, None)
 
     def __str__(self) -> str:
         data = self._get_content
