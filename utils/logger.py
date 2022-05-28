@@ -1,4 +1,5 @@
 from utils.moderator import CheckModerator
+from aiogram.types import Message
 from requests import get as http_get
 from static.config import BOT_TOKEN
 from typing import Literal, List
@@ -8,10 +9,11 @@ import logging as log
 class Logger:
     def __init__(
             self, level: Literal["info", "warning", "error"],
-            exception: dict
+            exception: dict, message: Message = None
     ) -> None:
         self.log_level = level
         self.exception = exception
+        self.message = message
 
     @property
     def _get_recipients(self) -> List[int]:
@@ -52,7 +54,7 @@ class Logger:
         return f"TRACE\n{'-'*10}\nLEVEL:\x20{self.log_level}\n" \
                f"In:\x20<code>{self.exception['function']}</code>\n" \
                f"Class:\x20<code>{self.exception['name']}</code>\n" \
-               f"{self.exception['details']}"
+               f"Description:\x20\"{self.exception['details']}\""
 
     @property
     def send(self) -> None:
