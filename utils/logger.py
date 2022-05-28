@@ -55,5 +55,5 @@ class Logger:
                f"{self.exception['details']}"
 
     @property
-    def send(self) -> _send_log:
-        return self._send_log
+    def send(self) -> None:
+        self._send_log

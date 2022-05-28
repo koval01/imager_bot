@@ -24,7 +24,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
-            })
+            }).send
             return False
 
     @property
@@ -35,7 +35,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._get_user.__name__
-            })
+            }).send
 
     @property
     def check_ban(self) -> bool:
@@ -57,7 +57,7 @@ class Manager:
         elif (user.tg_name_user != self.message.from_user.full_name) \
                 or (user.tg_username_user != self.message.from_user.username and (
                 self.message.from_user.username)):
-            self._update_user_name
+            _ = self._update_user_name
         return True
 
     @property
@@ -76,7 +76,7 @@ class Manager:
         except Exception as e:
             Logger("warning", {
                 "name": e.__class__.__name__, "details": e, "function": self._update_user_name.__name__
-            })
+            }).send
             return False
 
     @property
@@ -98,7 +98,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._add_user.__name__
-            })
+            }).send
             return False
 
     @property
@@ -106,8 +106,10 @@ class Manager:
         x = self.session.query(Content).filter_by(
             moderated=True, type_content=self.type_content)
         l = self._get_last_id
-        try: x[l]
-        except IndexError: return ""
+        try:
+            x[l]
+        except IndexError:
+            return ""
         return "" if not self._update_last_id_content \
             else (x[l].file_id if x.count() else "")
 
@@ -130,7 +132,7 @@ class Manager:
         except Exception as e:
             Logger("error", {
                 "name": e.__class__.__name__, "details": e, "function": self._update_last_id_content.__name__
-            })
+            }).send
             return False
 
     def __str__(self) -> str:
