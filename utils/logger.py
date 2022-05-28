@@ -35,7 +35,7 @@ class Logger:
     @property
     def _python_log(self) -> log:
         log_msg = "%s: %s" % (self.exception["name"], self.exception["details"])
-        return eval("log.%s(log_msg)" % self.log_level)
+        return eval(f"log.{self.log_level}({log_msg})")
 
     @property
     def _send_log(self) -> bool:
