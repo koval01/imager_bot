@@ -128,7 +128,7 @@ class Manager:
     @property
     def get_content(self) -> tuple:
         data = self._get_content
-        return data if type(data) == "tuple" else (None, None)
+        return data if data.__class__.__name__ == "tuple" else (None, None)
 
     def __str__(self) -> str:
         data = self._get_content

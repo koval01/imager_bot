@@ -23,13 +23,14 @@ class Selector:
         try:
             type_ = self.select_type
             content_id, file_id = Manager(type_content=type_, message=self.msg).get_content
+            log.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
                 await self.msg.reply(dict_reply["no_content"])
             else:
                 await eval(
-                    f"self.msg.reply_{type_}(data, "
-                    f"caption=str(content_id) reply_markup=build_menu(\"next_content\"))"
+                    f"self.msg.reply_{type_}(file_id, "
+                    f"caption=str(content_id), reply_markup=build_menu(\"next_content\"))"
                 )
         except Exception as e:
             await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
-            log.error("Error send content (%s). Details: %s" % (self.reply_selector.__name__, e))
+            log.error("Error send content (selector). Details: %s" % e)
