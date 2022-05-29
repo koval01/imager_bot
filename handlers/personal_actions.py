@@ -9,7 +9,7 @@ from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector
 from content.loader import LoaderContent
 from utils.throttling import rate_limit
-from utils.logger import Logger
+import logging as log
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
@@ -41,10 +41,7 @@ async def send_welcome(msg: types.Message):
 @dp.message_handler(commands=['test_log'], state="*", is_owner=True)
 async def test_log_handler(msg: types.Message):
     await msg.reply(dict_reply["test_log_reply"])
-    Logger("info", {
-        "name": "TestLogHandler", "details": "This log was called by administrator.",
-        "function": test_log_handler.__name__
-    }).send()
+    log.info("Test log called from bot by admin.")
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.html import mark_safe
 from .telegram_api import TelegramAPI
-from utils.logger import Logger
+import logging as log
 
 
 class Telegram(models.Model):
@@ -31,9 +31,7 @@ class Content(models.Model):
         try:
             content = TelegramAPI(str(self.file_id))
         except Exception as e:
-            Logger("info", {
-                "name": e.__class__.__name__, "details": e, "function": self.media_tag.__name__
-            }).send()
+            log.info("Error build media-tag in admin panel. Details: %s" % e)
             content = None
         return mark_safe(content)
 

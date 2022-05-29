@@ -1,10 +1,11 @@
+import logging as log
+
 from aiogram import types
 from database.controller import session_factory
 from database.models import Content
 from static import config
 from utils.moderator import CheckModerator
 from static.messages import dictionary as dict_reply
-from utils.logger import Logger
 
 
 class LoaderContent:
@@ -22,9 +23,7 @@ class LoaderContent:
                 if t == _type
             ][0]
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self._content_type.__name__
-            }).send()
+            log.warning("Error resolve content type (%s). Details: %s" % (self._content_type.__name__, e))
             return ""
 
     @property
@@ -50,9 +49,7 @@ class LoaderContent:
             if self.message.video_note:
                 return "video_note"
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self._video_note_check.__name__
-            }).send()
+            log.error("Error check content type (%s). Details: %s" % (self._video_note_check.__name__, e))
         return current_type
 
     @property
@@ -85,9 +82,7 @@ class LoaderContent:
             self.session.close()
             return True
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self._write_content_to_database.__name__
-            }).send()
+            log.error("Error add content to database. Details: %s" % e)
             return False
 
     @property
@@ -104,9 +99,7 @@ class LoaderContent:
 
             return dict_reply["content_success"]
         except Exception as e:
-            Logger("warning", {
-                "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
-            }).send()
+            log.warning("Add content init error. Details: %s" % e)
             return dict_reply["internal_error"] % e.__class__.__name__
 
     def __str__(self) -> str:

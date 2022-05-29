@@ -1,4 +1,3 @@
-from utils.logger import Logger
 import logging as log
 
 from static.config import GA_ID, GA_SECRET
@@ -33,9 +32,7 @@ class Analytics:
                         log.warning(f"Error code Google Analytics: {response.status}. "
                                     f"Detail response: {response.text[:512]}")
             except Exception as e:
-                Logger("error", {
-                    "name": e.__class__.__name__, "details": e, "function": self._request_ga_server.__name__
-                }).send()
+                log.error("Error send request to Google Analytics. Details: %s" % e)
 
     @property
     def _build_payload(self) -> dict:

@@ -2,7 +2,7 @@ from static.menu import build_menu, dictionary as menu_dict
 from static.messages import dictionary as dict_reply
 from aiogram.types import Message
 from content.manager import Manager
-from utils.logger import Logger
+import logging as log
 
 
 class Selector:
@@ -32,6 +32,4 @@ class Selector:
                 )
         except Exception as e:
             await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self.reply_selector.__name__
-            }).send()
+            log.error("Error send content (%s). Details: %s" % (self.reply_selector.__name__, e))

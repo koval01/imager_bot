@@ -1,7 +1,7 @@
 from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
-from utils.logger import Logger
+import logging as log
 
 
 class Manager:
@@ -22,9 +22,7 @@ class Manager:
             self.session.close()
             return True
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self.add_content.__name__
-            }).send()
+            log.error("Error add content. Details: %s" % e)
             return False
 
     @property
@@ -33,9 +31,7 @@ class Manager:
             return self.session.query(User).filter_by(
                 user_id=self.user_id).one()
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self._get_user.__name__
-            }).send()
+            log.error("Error get user. Details: %s" % e)
 
     @property
     def check_ban(self) -> bool:
@@ -74,9 +70,7 @@ class Manager:
             )
             self.session.commit()
         except Exception as e:
-            Logger("warning", {
-                "name": e.__class__.__name__, "details": e, "function": self._update_user_name.__name__
-            }).send()
+            log.warning("Error update user. Details: %s" % e)
             return False
 
     @property
@@ -96,9 +90,7 @@ class Manager:
             self.session.close()
             return True
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self._add_user.__name__
-            }).send()
+            log.error("Error add user. Details: %s" % e)
             return False
 
     @property
@@ -130,14 +122,12 @@ class Manager:
             self.session.commit()
             return True
         except Exception as e:
-            Logger("error", {
-                "name": e.__class__.__name__, "details": e, "function": self._update_last_id_content.__name__
-            }).send()
+            log.error("Error update last id content for user. Details: %s" % e)
             return False
 
     @property
     def get_content(self) -> tuple:
-        data = self.get_content
+        data = self._get_content
         return data if type(data) == "tuple" else (None, None)
 
     def __str__(self) -> str:
