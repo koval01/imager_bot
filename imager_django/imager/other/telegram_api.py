@@ -79,12 +79,12 @@ class TelegramAPI:
 
     def _html_view_build(self, data: dict) -> str:
         return f'<video height="300vh" controls muted autoplay>' \
-               f'<source src="/tg_api/{data["path"]}" type="video/mp4">' \
+               f'<source src="/app/tg_api/{data["path"]}" type="video/mp4">' \
                'Ваш браузер не поддерживает видео тег.</video>' \
             if data["type"] == "video" else (
-                f'<img src="/tg_api/{data["path"]}" height="300vh" />'
+                f'<img src="/app/tg_api/{data["path"]}" height="300vh" />'
                 if data["type"] == "photo"
-                else f'<audio controls><source src="/tg_api/{data["path"]}" type="audio/ogg">'
+                else f'<audio controls><source src="/app/tg_api/{data["path"]}" type="audio/ogg">'
                      f'Ваш браузер не поддерживает аудио элементы.</audio>'
             )
 
