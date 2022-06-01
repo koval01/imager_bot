@@ -2,7 +2,7 @@ from django.http import StreamingHttpResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.decorators import login_required
 from requests import get as http_get
-from other.telegram_api import TelegramAPI
+from .other.telegram_api import TelegramAPI
 
 
 def error_load(code: int) -> StreamingHttpResponse:

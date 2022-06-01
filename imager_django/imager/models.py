@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.html import mark_safe
-from other.telegram_api import TelegramAPI
+from .other.telegram_api import TelegramAPI
 import logging as log
 
 
