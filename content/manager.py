@@ -103,6 +103,9 @@ class Manager:
         self.session.close()
         return data
 
+    def _sort_content(self, content: list) -> list:
+        return sorted([el for el in list(content)], key=lambda x: x.id, reverse=False)
+
     @property
     def _get_content(self) -> str:
         content = self._get_content_query
@@ -111,10 +114,11 @@ class Manager:
             content[last_id]
         except IndexError:
             return ""
+        content_sorted = self._sort_content(content)
         return "" if not self._update_last_id_content \
             else \
             (
-                (content[last_id].id, content[last_id].file_id)
+                (content_sorted[last_id].id, content_sorted[last_id].file_id)
                 if content.count() else ""
             )
 
