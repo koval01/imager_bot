@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-<7f72oq45i5s:tv{7fvl}m<67dhn|kr8n2??c4j|9u:f1>6020ym}a0g03=8ct'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"] if DEBUG else [os.getenv("ALT_APP_DOMAIN")]
 
@@ -120,8 +120,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS[:]
 
 
