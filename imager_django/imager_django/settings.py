@@ -122,6 +122,7 @@ USE_TZ = True
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS[:]
 
 
 # Static files (CSS, JavaScript, Images)
