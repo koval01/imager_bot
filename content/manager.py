@@ -1,3 +1,5 @@
+import copy
+
 from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
@@ -103,8 +105,11 @@ class Manager:
         self.session.close()
         return data
 
-    def _sort_content(self, content: list) -> list:
-        return sorted([el for el in list(content)], key=lambda x: x.id, reverse=False)
+    def _sort_content(self, content: Content) -> list:
+        return sorted(
+            [el for el in copy.deepcopy(content.all())],
+            key=lambda x: x.id, reverse=False
+        )
 
     @property
     def _get_content(self) -> str:
