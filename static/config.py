@@ -7,6 +7,7 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 BOT_OWNER = int(getenv("BOT_OWNER"))
 
 APP_DOMAIN = getenv("APP_DOMAIN")
+ALT_APP_DOMAIN = getenv("ALT_APP_DOMAIN")
 DATABASE_URL = getenv("DATABASE_URL").replace("postgres://", "postgresql://")
 
 REDIS_URL = re.search(pattern_redis, getenv("REDIS_URL")).groupdict()
