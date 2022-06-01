@@ -38,7 +38,7 @@ class Content(models.Model):
     media_tag.short_description = 'Превью'
 
     def __str__(self):
-        return "%s (Проверенный: %s)" % (self.type_content, self.moderated)
+        return "Type: %s | ID: %d | Moderated: %s" % (self.type_content, self.id, self.moderated)
 
     class Meta:
         verbose_name = 'Контент'
@@ -62,7 +62,7 @@ class User(models.Model):
     )
 
     def __str__(self):
-        return "%s (Забанен: %s)" % (self.user_id, self.full_banned)
+        return "User ID: %s | ID: %d | Banned: %s" % (self.user_id, self.id, self.full_banned)
 
     class Meta:
         verbose_name = 'Пользователь'
