@@ -28,9 +28,10 @@ class LoaderContent:
 
     @property
     def _check_content_on_moderation(self) -> int:
-        x = self.session.query(Content).filter_by(
+        content = self.session.query(Content).filter_by(
             moderated=False, loader_id=self.message.from_user.id)
-        return x.count()
+        self.session.close()
+        return content.count()
 
     @property
     def _allow_load(self) -> bool:

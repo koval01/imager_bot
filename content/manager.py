@@ -28,8 +28,10 @@ class Manager:
     @property
     def _get_user(self) -> User or None:
         try:
-            return self.session.query(User).filter_by(
+            data = self.session.query(User).filter_by(
                 user_id=self.user_id).one()
+            self.session.close()
+            return data
         except Exception as e:
             log.error("Error get user. Details: %s" % e)
 
@@ -69,6 +71,7 @@ class Manager:
                 }
             )
             self.session.commit()
+            self.session.close()
         except Exception as e:
             log.warning("Error update user. Details: %s" % e)
             return False
@@ -94,21 +97,32 @@ class Manager:
             return False
 
     @property
-    def _get_content(self) -> str:
-        x = self.session.query(Content).filter_by(
+    def _get_content_query(self) -> Content:
+        data = self.session.query(Content).filter_by(
             moderated=True, type_content=self.type_content)
-        l = self._get_last_id
+        self.session.close()
+        return data
+
+    @property
+    def _get_content(self) -> str:
+        content = self._get_content_query
+        last_id = self._get_last_id
         try:
-            x[l]
+            content[last_id]
         except IndexError:
             return ""
         return "" if not self._update_last_id_content \
-            else ((x[l].id, x[l].file_id) if x.count() else "")
+            else \
+            (
+                (content[last_id].id, content[last_id].file_id)
+                if content.count() else ""
+            )
 
     @property
     def _get_last_id(self) -> int:
         x = self.session.query(User).filter_by(
             user_id=self.user_id).all()
+        self.session.close()
         return eval(f"int(x[0].last_{self.type_content})")
 
     @property
@@ -120,6 +134,7 @@ class Manager:
                 eval("{User.last_%s: User.last_%s + 1}" % (self.type_content, self.type_content))
             )
             self.session.commit()
+            self.session.close()
             return True
         except Exception as e:
             log.error("Error update last id content for user. Details: %s" % e)
@@ -132,5 +147,4 @@ class Manager:
 
     def __str__(self) -> str:
         data = self._get_content
-        self.session.close()
         return data
