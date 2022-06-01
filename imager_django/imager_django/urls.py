@@ -20,3 +20,10 @@ urlpatterns = [
     path('/', admin.site.urls),
     path('', include('imager.urls')),
 ]
+
+handler400 = 'imager.views.error_400'
+handler401 = 'imager.views.error_401'
+handler403 = 'imager.views.error_403'
+handler404 = 'imager.views.error_404'
+handler405 = 'imager.views.error_405'
+handler500 = 'imager.views.error_500'
