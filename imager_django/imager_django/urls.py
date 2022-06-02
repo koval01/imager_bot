@@ -21,9 +21,9 @@ urlpatterns = [
     path('', admin.site.urls),
 ]
 
-handler400 = 'imager.views.error_response'
-handler401 = 'imager.views.error_response'
-handler403 = 'imager.views.error_response'
-handler404 = 'imager.views.error_response'
-handler405 = 'imager.views.error_response'
-handler500 = 'imager.views.error_response'
+handler400 = 'imager.views.error_400'
+handler401 = 'imager.views.error_401'
+handler403 = 'imager.views.error_403'
+handler404 = 'imager.views.error_404'
+handler405 = 'imager.views.error_405'
+handler500 = 'imager.views.error_500'
