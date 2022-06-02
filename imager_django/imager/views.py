@@ -1,4 +1,4 @@
-from django.http import StreamingHttpResponse, HttpResponse
+from django.http import StreamingHttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.decorators import login_required
 from requests import get as http_get
@@ -18,25 +18,11 @@ def get_image(request, file_type, file_name) -> StreamingHttpResponse:
     return TelegramAPI(path=f"{file_type}/{file_name}").get_file
 
 
-def error_400(request, exception='Unknown') -> HttpResponse:
-    return HttpResponse("", status=400)
-
-
-def error_401(request, exception='Unknown') -> HttpResponse:
-    return HttpResponse("", status=401)
-
-
-def error_403(request, exception='Unknown') -> HttpResponse:
-    return HttpResponse("", status=403)
-
-
-def error_404(request, exception='Unknown') -> HttpResponse:
-    return HttpResponse("", status=404)
-
-
-def error_405(request, exception='Unknown') -> HttpResponse:
-    return HttpResponse("", status=405)
-
-
-def error_500(request, exception='Unknown') -> HttpResponse:
-    return HttpResponse("", status=500)
+def error_response(request, exception='Unknown') -> JsonResponse:
+    return JsonResponse(
+        {
+            "status_code": request.status_code, "stamp": hex(int(time() * 1000000)),
+            "exception": exception
+        },
+        status=request.status_code
+    )
