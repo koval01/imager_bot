@@ -1,5 +1,7 @@
 import copy
 
+from typing import List
+
 from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
@@ -105,22 +107,23 @@ class Manager:
         self.session.close()
         return data
 
-    def _sort_content(self, content: Content) -> list:
+    @staticmethod
+    def _sort_content(content: Content) -> List[Content]:
         return sorted(
             [el for el in copy.deepcopy(content.all())],
             key=lambda x: x.id, reverse=False
         )
 
     @property
-    def _get_content(self) -> str:
+    def _get_content(self) -> tuple or None:
         content = self._get_content_query
         last_id = self._get_last_id
         try:
             content[last_id]
         except IndexError:
-            return ""
+            return
         content_sorted = self._sort_content(content)
-        return "" if not self._update_last_id_content \
+        return None if not self._update_last_id_content \
             else \
             (
                 (content_sorted[last_id].id, content_sorted[last_id].file_id)
