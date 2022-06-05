@@ -13,6 +13,7 @@ gunicorn = "*"
 whitenoise = "*"
 requests = "*"
 aiohttp = "*"
+"dogpile.cache" = "*"
 
 [dev-packages]
 

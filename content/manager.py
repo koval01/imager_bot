@@ -5,6 +5,7 @@ from typing import List
 from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
+from database.caching_query import FromCache
 import logging as log
 
 
@@ -32,7 +33,7 @@ class Manager:
     @property
     def _get_user(self) -> User or None:
         try:
-            data = self.session.query(User).filter_by(
+            data = self.session.query(User).options(FromCache("get_user", expiration_time=300)).filter_by(
                 user_id=self.user_id).one()
             self.session.close()
             return data
@@ -42,7 +43,7 @@ class Manager:
     @property
     def _get_all_users(self) -> List[User] or None:
         try:
-            data = self.session.query(User).all()
+            data = self.session.query(User).options(FromCache("get_all_users", expiration_time=120)).all()
             self.session.close()
             return data
         except Exception as e:
@@ -115,7 +116,9 @@ class Manager:
 
     @property
     def _get_content_query(self) -> Content:
-        data = self.session.query(Content).filter_by(
+        data = self.session.query(Content).options(
+            FromCache("get_content_query", expiration_time=600)
+        ).filter_by(
             moderated=True, type_content=self.type_content)
         self.session.close()
         return data
