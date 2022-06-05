@@ -26,6 +26,7 @@ class Content(models.Model):
     moderated = models.BooleanField(
         'Проверенный', help_text="Если контент отмечен как проверенный, то он попадает пользователям в выдачу."
     )
+    dislikes = models.IntegerField("Число дизлайков", null=False, default=0)
 
     def media_tag(self):
         try:

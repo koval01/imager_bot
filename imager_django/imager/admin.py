@@ -20,8 +20,8 @@ class TelegramAdmin(BaseUserAdmin):
 class ContentAdmin(admin.ModelAdmin):
     list_display = ('id', 'loader_id', 'type_content', 'moderated')
     list_filter = ('moderated', 'type_content')
-    fields = ['media_tag', 'moderated', 'type_content', 'loader_id', 'file_id']
-    readonly_fields = ['media_tag', 'type_content', 'loader_id', 'file_id']
+    fields = ['media_tag', 'moderated', 'dislikes', 'type_content', 'loader_id', 'file_id']
+    readonly_fields = ['media_tag', 'type_content', 'dislikes', 'loader_id', 'file_id']
 
 
 class UserAdmin(admin.ModelAdmin):
