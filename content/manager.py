@@ -12,8 +12,8 @@ class Manager:
     def __init__(self, type_content: str = "photo", message: Message = None) -> None:
         self.session = session_factory()
         self.type_content = type_content
-        self.user_id = message.from_user.id
         self.message = message
+        self.user_id = message.from_user.id if message else None
 
     def add_content(self, file_id: str) -> bool:
         try:
@@ -38,6 +38,19 @@ class Manager:
             return data
         except Exception as e:
             log.error("Error get user. Details: %s" % e)
+
+    @property
+    def _get_all_users(self) -> List[User] or None:
+        try:
+            data = self.session.query(User).all()
+            self.session.close()
+            return data
+        except Exception as e:
+            log.error("Error get user. Details: %s" % e)
+
+    @property
+    def get_all_users_ids(self) -> List[int] or None:
+        return [user.user_id for user in self._get_all_users]
 
     @property
     def check_ban(self) -> bool:

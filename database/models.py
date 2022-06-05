@@ -48,7 +48,8 @@ class Content(Base):
     )
     loader_id = Column(BigInteger, nullable=False)
     file_id = Column(String(255), nullable=False, index=True, unique=True)
-    moderated = Column(Boolean)
+    moderated = Column(Boolean, default=False)
+    dislikes = Column(Integer, nullable=False, default=0)
 
     def __init__(self, type_content, loader_id, file_id, moderated):
         self.type_content = type_content
@@ -66,11 +67,11 @@ class User(Base):
     user_id = Column(BigInteger, nullable=False, index=True, unique=True)
     tg_name_user = Column(String(255), default="Unknown", nullable=False)
     tg_username_user = Column(String(255), default="@Unknown", nullable=False)
-    banned = Column(Boolean)
-    full_banned = Column(Boolean)
-    last_photo = Column(BigInteger)
-    last_video = Column(BigInteger)
-    last_voice = Column(BigInteger)
+    banned = Column(Boolean, default=False)
+    full_banned = Column(Boolean, default=False)
+    last_photo = Column(BigInteger, default=0, nullable=False)
+    last_video = Column(BigInteger, default=0, nullable=False)
+    last_voice = Column(BigInteger, default=0, nullable=False)
 
     def __init__(self, user_id, tg_name_user, tg_username_user, banned, full_banned, last_photo, last_video, last_voice):
         self.user_id = user_id

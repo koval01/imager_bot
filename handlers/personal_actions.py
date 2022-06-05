@@ -2,12 +2,13 @@ from aiogram import types
 from aiogram.types import ChatType, ContentType
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import Throttled
-from dispatcher import dp
+from dispatcher import dp, bot
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector
 from content.loader import LoaderContent
+from content.manager import Manager
 from utils.throttling import rate_limit
 import logging as log
 
@@ -42,6 +43,26 @@ async def send_welcome(msg: types.Message):
 async def test_log_handler(msg: types.Message):
     await msg.reply(dict_reply["test_log_reply"])
     log.info("Test log called from bot by admin.")
+
+
+@dp.message_handler(commands=['news'], is_moderator=True)
+async def news_send_handler(msg: types.Message):
+
+    async def _send_messages() -> int:
+        users = Manager().get_all_users_ids
+        successes = 0
+        for user_id in users:
+            try:
+                await bot.send_message(user_id, msg.get_args())
+                successes += 1
+            except Exception as e:
+                log.info("Error send message. Details: %s" % e)
+        return successes
+
+    await msg.reply(dict_reply["init_news_send"])
+    successes_count = \
+        await _send_messages()
+    await msg.reply(dict_reply["finish_news_send"] % successes_count)
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
