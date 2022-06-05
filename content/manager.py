@@ -46,7 +46,7 @@ class Manager:
     def _get_all_users(self) -> List[User] or None:
         try:
             data = self.session.query(User).options(
-                FromCache("get_all_users", expiration_time=120)).all()
+                FromCache("get_all_users", expiration_time=180)).all()
             self.session.close()
             return data
         except Exception as e:
