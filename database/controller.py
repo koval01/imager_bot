@@ -2,9 +2,12 @@ from static import config
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 
-engine = create_engine(config.DATABASE_URL, pool_size=20, max_overflow=0)
+engine = create_engine(
+    config.DATABASE_URL, poolclass=NullPool
+)
 _SessionFactory = sessionmaker(bind=engine)
 
 Base = declarative_base()
