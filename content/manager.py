@@ -151,7 +151,7 @@ class Manager:
                 return
             log.debug("Get content: last_id = %d" % _selector)
         else:
-            _selector = randint(0, len(content_sorted))
+            _selector = randint(0, len(content_sorted) - 1)
             log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \
             else \
