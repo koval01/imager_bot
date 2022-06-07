@@ -15,7 +15,8 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    sys.argv.append(sys.argv.pop(sys.argv.index("debug_run")))
+    sys.argv.append(sys.argv.pop(sys.argv.index("debug_run"))) \
+        if "debug_run" in sys.argv else None
     execute_from_command_line(
         sys.argv[:-1] if "debug_run" in sys.argv else sys.argv)
 
