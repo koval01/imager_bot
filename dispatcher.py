@@ -10,6 +10,9 @@ from static import config
 from utils.throttling import ThrottlingMiddleware
 from utils.analytics import AnalyticsMiddleware
 
+# update sys args
+sys.argv.append("") if not len(sys.argv) else None
+
 # env init
 _is_debug_run = True if sys.argv[1] == "debug_run" else False
 
