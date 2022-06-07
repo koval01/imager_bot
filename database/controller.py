@@ -6,7 +6,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 
 engine = create_engine(
-    config.DATABASE_URL, poolclass=SingletonThreadPool, pool_size=12
+    config.DATABASE_URL, poolclass=SingletonThreadPool, pool_size=16
 )
 _SessionFactory = sessionmaker(bind=engine)
 
