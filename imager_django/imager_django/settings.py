@@ -13,10 +13,29 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import re
 import os
+import sys
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn=os.getenv("DJANGO_SENTRY"),
+    integrations=[DjangoIntegration()],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 pattern_postgres = re.compile(r"postgres:\/\/(?P<user>[A-z0-9]*?):(?P<password>[A-z0-9]*?)@(?P<host>[A-z0-9\-\.]*?)"
                               r":(?P<port>[0-9]{4,5})\/(?P<database>[A-z0-9]*$)")
 DATABASE_URL_ELS = re.search(pattern_postgres, str(os.getenv("DATABASE_URL"))).groupdict()
+
+_is_debug_run = True if "debug_run" in sys.argv else False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +48,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-<7f72oq45i5s:tv{7fvl}m<67dhn|kr8n2??c4j|9u:f1>6020ym}a0g03=8ct'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = _is_debug_run
 
 ALLOWED_HOSTS = ["*"] if DEBUG else [os.getenv("ALT_APP_DOMAIN")]
 
