@@ -7,7 +7,8 @@ dictionary = {
     "start_menu": ["Смотреть", "Добавить"],
     "select_mode": ["Фото", "Видео", "Голосовые"],
     "cancel": ["🙅‍♂️"],
-    "next_content": ["🙅‍♂️", "➡️"]
+    "next_content": ["🙅‍♂️", "➡️"],
+    "rand_or_last": ["Рандом", "По порядку"]
 }
 
 def build_menu(name: str) -> ReplyKeyboardMarkup:

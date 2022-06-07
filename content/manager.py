@@ -6,15 +6,20 @@ from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
 from database.caching_query import FromCache
+from random import randint
 import logging as log
 
 
 class Manager:
-    def __init__(self, type_content: str = "photo", message: Message = None) -> None:
+    def __init__(
+            self, type_content: str = "photo", message: Message = None,
+            get_content_random: bool = False
+    ) -> None:
         self.session = session_factory()
         self.type_content = type_content
         self.message = message
         self.user_id = message.from_user.id if message else None
+        self.get_content_random = get_content_random
 
     def add_content(self, file_id: str) -> bool:
         try:
@@ -136,16 +141,22 @@ class Manager:
     @property
     def _get_content(self) -> tuple or None:
         content = self._get_content_query
-        last_id = self._get_last_id
-        try:
-            content[last_id]
-        except IndexError:
-            return
         content_sorted = self._sort_content(content)
+        log.debug("Random get content = %s" % self.get_content_random)
+        if not self.get_content_random:
+            _selector = self._get_last_id
+            try:
+                content[_selector]
+            except IndexError:
+                return
+            log.debug("Get content: last_id = %d" % _selector)
+        else:
+            _selector = randint(0, len(content_sorted))
+            log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \
             else \
             (
-                (content_sorted[last_id].id, content_sorted[last_id].file_id)
+                (content_sorted[_selector].id, content_sorted[_selector].file_id)
                 if content.count() else ""
             )
 

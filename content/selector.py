@@ -6,9 +6,10 @@ import logging as log
 
 
 class Selector:
-    def __init__(self, msg: Message) -> None:
+    def __init__(self, msg: Message, text_order_mode: str) -> None:
         self.msg = msg
         self.user_text = self.msg.text
+        self.text_order_mode = text_order_mode
 
     @property
     def select_type(self) -> str:
@@ -19,10 +20,17 @@ class Selector:
         ][0]
 
     @property
+    def _select_order_mode(self) -> bool or None:
+        _mode = lambda x: self.text_order_mode == menu_dict["rand_or_last"][x]
+        return True if _mode(0) else (False if _mode(1) else None)
+
+    @property
     async def reply_selector(self) -> Message:
         try:
             type_ = self.select_type
-            content_id, file_id = Manager(type_content=type_, message=self.msg).get_content
+            content_id, file_id = Manager(
+                type_content=type_, message=self.msg, get_content_random=self._select_order_mode
+            ).get_content
             log.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
                 await self.msg.reply(dict_reply["no_content"])
