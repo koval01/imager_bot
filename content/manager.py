@@ -6,7 +6,7 @@ from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
 from database.caching_query import FromCache
-from random import randint
+from random import randint, sample as rand_mix
 import logging as log
 
 
@@ -141,22 +141,24 @@ class Manager:
     @property
     def _get_content(self) -> tuple or None:
         content = self._get_content_query
-        content_sorted = self._sort_content(content)
         log.debug("Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
+            _content_sorted = self._sort_content(content)
             _selector = self._get_last_id
             try:
                 content[_selector]
             except IndexError:
                 return
+            content = _content_sorted
             log.debug("Get content: last_id = %d" % _selector)
         else:
-            _selector = randint(0, len(content_sorted) - 1)
+            _selector = randint(0, len(content) - 1)
+            content = rand_mix(content, len(content))
             log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \
             else \
             (
-                (content_sorted[_selector].id, content_sorted[_selector].file_id)
+                (content[_selector].id, content[_selector].file_id)
                 if content.count() else ""
             )
 
