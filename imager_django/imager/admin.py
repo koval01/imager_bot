@@ -7,6 +7,16 @@ import logging as log
 import json
 
 
+@admin.action(description='Отметить как проверенный')
+def make_moderated(modeladmin, request, queryset):
+    queryset.update(moderated=True)
+
+
+@admin.action(description='Отметить как НЕпроверенный')
+def make_not_moderated(modeladmin, request, queryset):
+    queryset.update(moderated=False)
+
+
 class MyAdminSite(admin.AdminSite):
     # Disable View on Site link on admin page
     site_url = None
@@ -27,6 +37,7 @@ class ContentAdmin(admin.ModelAdmin):
     list_filter = ('moderated', 'type_content')
     fields = ['media_tag', 'moderated', 'dislikes', 'type_content', 'loader_id', 'file_id']
     search_fields = ['loader_id', 'file_id']
+    actions = [make_moderated, make_not_moderated]
     readonly_fields = ['media_tag', 'type_content', 'dislikes', 'loader_id', 'file_id']
 
 
