@@ -6,6 +6,7 @@ from database.models import Content
 from static import config
 from utils.moderator import CheckModerator
 from static.messages import dictionary as dict_reply
+from utils.decorators import timer
 
 
 class LoaderContent:
@@ -27,6 +28,7 @@ class LoaderContent:
             return ""
 
     @property
+    @timer
     def _check_content_on_moderation(self) -> int:
         content = self.session.query(Content).filter_by(
             moderated=False, loader_id=self.message.from_user.id)
@@ -69,8 +71,8 @@ class LoaderContent:
             _size = eval(f"self.message.{self._video_note_check(_type)}.file_size")
             return True if _size < 20971520 else False
 
-
     @property
+    @timer
     def _write_content_to_database(self) -> bool:
         try:
             self.session.add(Content(

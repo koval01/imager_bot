@@ -6,7 +6,8 @@ from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
 from database.caching_query import FromCache
-from random import randint, shuffle
+from random import randrange
+from utils.decorators import timer
 import logging as log
 
 
@@ -21,6 +22,7 @@ class Manager:
         self.user_id = message.from_user.id if message else None
         self.get_content_random = get_content_random
 
+    @timer
     def add_content(self, file_id: str) -> bool:
         try:
             self.session.add(Content(
@@ -36,6 +38,7 @@ class Manager:
             return False
 
     @property
+    @timer
     def _get_user(self) -> User or None:
         try:
             data = self.session.query(User).options(
@@ -48,6 +51,7 @@ class Manager:
             log.error("Error get user. Details: %s" % e)
 
     @property
+    @timer
     def _get_all_users(self) -> List[User] or None:
         try:
             data = self.session.query(User).options(
@@ -85,6 +89,7 @@ class Manager:
         return True
 
     @property
+    @timer
     def _update_user_name(self) -> bool:
         try:
             username = self.message.from_user.username
@@ -103,6 +108,7 @@ class Manager:
             return False
 
     @property
+    @timer
     def _add_user(self) -> bool:
         try:
             self.session.add(User(
@@ -123,6 +129,7 @@ class Manager:
             return False
 
     @property
+    @timer
     def _get_content_query(self) -> Content:
         data = self.session.query(Content).options(
             FromCache("get_content_query", expiration_time=600)
@@ -132,6 +139,7 @@ class Manager:
         return data
 
     @staticmethod
+    @timer
     def _sort_content(content: Content) -> List[Content]:
         return sorted(
             [el for el in copy.deepcopy(content.all())],
@@ -140,6 +148,14 @@ class Manager:
 
     @property
     def _get_content(self) -> tuple or None:
+
+        @timer
+        def _random_select(content_data: list, samples: int = 10) -> int:
+            return [
+                randrange(0, len(content_data[:]) - 1)
+                for _ in range(samples)
+            ][randrange(samples)]
+
         content = self._get_content_query
         log.debug("Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
@@ -152,10 +168,8 @@ class Manager:
             content_list = _content_sorted
             log.debug("Get content: last_id = %d" % _selector)
         else:
-            _content = list(content[:])
-            _selector = randint(0, len(_content) - 1)
-            content_list = _content
-            shuffle(content_list)
+            _selector = _random_select(content, samples=5)
+            content_list = content
             log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \
             else \
@@ -165,6 +179,7 @@ class Manager:
             )
 
     @property
+    @timer
     def _get_last_id(self) -> int:
         x = self.session.query(User).filter_by(
             user_id=self.user_id).all()
@@ -172,6 +187,7 @@ class Manager:
         return eval(f"int(x[0].last_{self.type_content})")
 
     @property
+    @timer
     def _update_last_id_content(self) -> bool:
         try:
             self.session.query(User).filter_by(
