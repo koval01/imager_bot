@@ -1,3 +1,6 @@
+from django.forms.utils import flatatt
+from django.utils.html import format_html
+
 import logging as log
 import mimetypes
 import os
@@ -78,16 +81,29 @@ class TelegramAPI:
         )
 
     def _html_view_build(self, data: dict) -> str:
-        base_path = "/app/tg_api/"
-        return f'<video height="300vh" controls muted autoplay>' \
-               f'<source src="{base_path}{data["path"]}" type="video/mp4">' \
-               'Ваш браузер не поддерживает видео тег.</video>' \
-            if data["type"] == "video" else (
-                f'<img src="{base_path}{data["path"]}" height="300vh" />'
-                if data["type"] == "photo"
-                else f'<audio controls><source src="{base_path}{data["path"]}" type="audio/ogg">'
-                     f'Ваш браузер не поддерживает аудио элементы.</audio>'
-            )
+        _path = "/app/tg_api/%s" % data["path"]
+        _video = format_html(
+            "<video{} controls muted autoplay><source{}>{}</video>",
+            flatatt({"height": "300vh"}),
+            flatatt({"src": _path, "type": "video/mp4"}),
+            "Ваш браузер не поддерживает видео тег."
+        )
+        _img = format_html(
+            "<img{}/>", flatatt({
+                "src": _path, "height": "300vh",
+                "onerror": "this.src=\"//http.cat/404\""
+            })
+        )
+        _audio = format_html(
+            "<audio{} controls><source{}>{}</audio>",
+            flatatt({"height": "300vh"}),
+            flatatt({"src": _path, "type": "audio/ogg"}),
+            "Ваш браузер не поддерживает аудио элементы."
+        )
+        print("data", _video, _img, _audio)
+        return _video \
+            if data["type"] == "video" \
+            else (_img if data["type"] == "photo" else _audio)
 
     @property
     def get(self) -> str:
