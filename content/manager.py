@@ -149,16 +149,16 @@ class Manager:
                 content[_selector]
             except IndexError:
                 return
-            content = _content_sorted
+            content_list = _content_sorted
             log.debug("Get content: last_id = %d" % _selector)
         else:
             _selector = randint(0, len(content) - 1)
-            content = rand_mix(content, len(content))
+            content_list = rand_mix(content, len(content))
             log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \
             else \
             (
-                (content[_selector].id, content[_selector].file_id)
+                (content_list[_selector].id, content_list[_selector].file_id)
                 if content.count() else ""
             )
 
