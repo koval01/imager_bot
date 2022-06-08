@@ -6,7 +6,7 @@ from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
 from database.caching_query import FromCache
-from random import randint, sample as rand_mix
+from random import randint, shuffle
 import logging as log
 
 
@@ -154,7 +154,8 @@ class Manager:
         else:
             _content = list(content[:])
             _selector = randint(0, len(_content) - 1)
-            content_list = list(rand_mix(content, len(_content)))
+            content_list = _content
+            shuffle(content_list)
             log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \
             else \
