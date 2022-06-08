@@ -1,40 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User as User_DJ
 from django.contrib.admin.models import LogEntry
+from django.utils.translation import ngettext
 from .models import Content, User, Telegram
 import logging as log
 import json
-
-
-@admin.action(description='Отметить как проверенный')
-def make_moderated(modeladmin, request, queryset):
-    queryset.update(moderated=True)
-
-
-@admin.action(description='Отметить как НЕпроверенный')
-def make_not_moderated(modeladmin, request, queryset):
-    queryset.update(moderated=False)
-
-
-@admin.action(description='Забанить (Запрет на загрузку контента)')
-def ban_user(modeladmin, request, queryset):
-    queryset.update(banned=True)
-
-
-@admin.action(description='Снять бан (Запрет на загрузку контента)')
-def unban_user(modeladmin, request, queryset):
-    queryset.update(banned=False)
-
-
-@admin.action(description='Забанить (Закрыть доступ)')
-def full_ban_user(modeladmin, request, queryset):
-    queryset.update(full_banned=True)
-
-
-@admin.action(description='Снять бан (Закрыть доступ)')
-def full_unban_user(modeladmin, request, queryset):
-    queryset.update(full_banned=False)
 
 
 class MyAdminSite(admin.AdminSite):
@@ -53,6 +24,25 @@ class TelegramAdmin(BaseUserAdmin):
 
 
 class ContentAdmin(admin.ModelAdmin):
+
+    @admin.action(description='Отметить как проверенный')
+    def make_moderated(self, request, queryset):
+        updated = queryset.update(moderated=True)
+        self.message_user(request, ngettext(
+            '%d элемент контента обозначен как проверенный.',
+            '%d элементов контента обозначены как проверенные.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
+    @admin.action(description='Отметить как НЕпроверенный')
+    def make_not_moderated(self, request, queryset):
+        updated = queryset.update(moderated=False)
+        self.message_user(request, ngettext(
+            '%d элемент контента обозначен как НЕпроверенный.',
+            '%d элементов контента обозначены как НЕпроверенные.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
     list_display = ('id', 'loader_id', 'type_content', 'moderated')
     list_filter = ('moderated', 'type_content')
     fields = ['media_tag', 'moderated', 'dislikes', 'type_content', 'loader_id', 'file_id']
@@ -62,6 +52,43 @@ class ContentAdmin(admin.ModelAdmin):
 
 
 class UserAdmin(admin.ModelAdmin):
+
+    @admin.action(description='Забанить (Запрет на загрузку контента)')
+    def ban_user(self, request, queryset):
+        updated = queryset.update(banned=True)
+        self.message_user(request, ngettext(
+            '%d пользователь теперь НЕ сможет добавлять контент.',
+            '%d пользователей теперь НЕ смогут добавлять контент.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
+    @admin.action(description='Снять бан (Запрет на загрузку контента)')
+    def unban_user(self, request, queryset):
+        updated = queryset.update(banned=False)
+        self.message_user(request, ngettext(
+            '%d пользователь теперь сможет добавлять контент.',
+            '%d пользователей теперь смогут добавлять контент.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
+    @admin.action(description='Забанить (Закрыть доступ)')
+    def full_ban_user(self, request, queryset):
+        updated = queryset.update(full_banned=True)
+        self.message_user(request, ngettext(
+            '%d пользователь теперь НЕ сможет пользоваться ботом.',
+            '%d пользователей теперь НЕ смогут пользоваться ботом.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
+    @admin.action(description='Снять бан (Закрыть доступ)')
+    def full_unban_user(self, request, queryset):
+        updated = queryset.update(full_banned=False)
+        self.message_user(request, ngettext(
+            '%d пользователь теперь сможет пользоваться ботом.',
+            '%d пользователей теперь смогут пользоваться ботом.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
     list_display = (
         'id', 'user_id', 'tg_name_user', 'tg_username_user',
         'banned', 'full_banned', 'last_photo', 'last_video', 'last_voice'
