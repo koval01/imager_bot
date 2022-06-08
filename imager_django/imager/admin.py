@@ -17,6 +17,26 @@ def make_not_moderated(modeladmin, request, queryset):
     queryset.update(moderated=False)
 
 
+@admin.action(description='Забанить (Запрет на загрузку контента)')
+def ban_user(modeladmin, request, queryset):
+    queryset.update(banned=True)
+
+
+@admin.action(description='Снять бан (Запрет на загрузку контента)')
+def unban_user(modeladmin, request, queryset):
+    queryset.update(banned=False)
+
+
+@admin.action(description='Забанить (Закрыть доступ)')
+def full_ban_user(modeladmin, request, queryset):
+    queryset.update(full_banned=True)
+
+
+@admin.action(description='Снять бан (Закрыть доступ)')
+def full_unban_user(modeladmin, request, queryset):
+    queryset.update(full_banned=False)
+
+
 class MyAdminSite(admin.AdminSite):
     # Disable View on Site link on admin page
     site_url = None
@@ -51,9 +71,8 @@ class UserAdmin(admin.ModelAdmin):
         'user_id', 'tg_name_user', 'tg_username_user', 'banned',
         'full_banned', 'last_photo', 'last_video', 'last_voice'
     ]
-    search_fields = [
-        'user_id', 'tg_name_user', 'tg_username_user'
-    ]
+    actions = [ban_user, unban_user, full_ban_user, full_unban_user]
+    search_fields = ['user_id', 'tg_name_user', 'tg_username_user']
     readonly_fields = [
         'user_id', 'tg_name_user', 'tg_username_user',
         'last_photo', 'last_video', 'last_voice'
