@@ -2,7 +2,9 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User as User_DJ
 from django.contrib.admin.models import LogEntry
+from django.utils.html import format_html
 from django.utils.translation import ngettext
+from django.forms.utils import flatatt
 from .models import Content, User, Telegram
 import logging as log
 import json
@@ -95,9 +97,14 @@ class UserAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
+    def user_link(self, obj):
+        author = obj.tg_username_user
+        return format_html("<a{}>{}</a>", flatatt({"href": "//t.me/%s" % author}), author) \
+            if author != "@Unknown" else author
+
     list_display = (
-        'id', 'user_id', 'tg_name_user', 'tg_username_user',
-        'banned', 'full_banned', 'last_photo', 'last_video', 'last_voice'
+        'id', 'user_id', 'tg_name_user', 'user_link',
+        'banned', 'full_banned'
     )
     list_filter = ('banned', 'full_banned')
     fields = [
