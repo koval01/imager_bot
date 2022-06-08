@@ -118,6 +118,8 @@ class UserAdmin(admin.ModelAdmin):
         'last_photo', 'last_video', 'last_voice'
     ]
 
+    user_link.__name__ = 'Юзернейм пользователя'
+
 
 class LogEntryAdmin(admin.ModelAdmin):
     list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
