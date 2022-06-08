@@ -89,6 +89,12 @@ class UserAdmin(admin.ModelAdmin):
             updated,
         ) % updated, messages.SUCCESS)
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
     list_display = (
         'id', 'user_id', 'tg_name_user', 'tg_username_user',
         'banned', 'full_banned', 'last_photo', 'last_video', 'last_voice'
