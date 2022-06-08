@@ -26,6 +26,7 @@ class ContentAdmin(admin.ModelAdmin):
     list_display = ('id', 'loader_id', 'type_content', 'moderated')
     list_filter = ('moderated', 'type_content')
     fields = ['media_tag', 'moderated', 'dislikes', 'type_content', 'loader_id', 'file_id']
+    search_fields = ['loader_id', 'file_id']
     readonly_fields = ['media_tag', 'type_content', 'dislikes', 'loader_id', 'file_id']
 
 
@@ -38,6 +39,9 @@ class UserAdmin(admin.ModelAdmin):
     fields = [
         'user_id', 'tg_name_user', 'tg_username_user', 'banned',
         'full_banned', 'last_photo', 'last_video', 'last_voice'
+    ]
+    search_fields = [
+        'user_id', 'tg_name_user', 'tg_username_user'
     ]
     readonly_fields = [
         'user_id', 'tg_name_user', 'tg_username_user',
