@@ -7,6 +7,11 @@ import logging as log
 import json
 
 
+class MyAdminSite(admin.AdminSite):
+    # Disable View on Site link on admin page
+    site_url = None
+
+
 class TelegramInline(admin.StackedInline):
     model = Telegram
     can_delete = False
