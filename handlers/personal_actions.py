@@ -35,8 +35,9 @@ async def cancel_action(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=['start', 'help'], state="*")
 @rate_limit(1.5, 'start_command')
-async def send_welcome(msg: types.Message):
+async def send_welcome(msg: types.Message, state: FSMContext):
     await msg.reply(dict_reply["start_message"], reply_markup=build_menu("start_menu"))
+    await state.finish()
 
 
 @dp.message_handler(commands=['test_log'], state="*", is_owner=True)
@@ -163,5 +164,6 @@ async def select_content_order_mode(msg: types.Message, state: FSMContext):
 
 @dp.message_handler()
 @rate_limit(0.5, 'any_data')
-async def any_messages(msg: types.Message):
+async def any_messages(msg: types.Message, state: FSMContext):
     await msg.reply(dict_reply["unknown_answer"], reply_markup=build_menu("start_menu"))
+    await state.finish()
