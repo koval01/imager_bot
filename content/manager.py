@@ -6,9 +6,9 @@ from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
 from database.caching_query import FromCache
-from random import randrange
 from utils.decorators import timer
 import logging as log
+import numpy as np
 
 
 class Manager:
@@ -151,10 +151,9 @@ class Manager:
 
         @timer
         def _random_select(content_data: list, samples: int = 10) -> int:
-            return [
-                randrange(0, len(content_data[:]) - 1)
-                for _ in range(samples)
-            ][randrange(samples)]
+            _array = np.random.choice(len(content_data[:]), samples, replace=True)
+            np.random.shuffle(_array)
+            return _array[0]
 
         content = self._get_content_query
         log.debug("Random get content = %s" % self.get_content_random)
@@ -168,7 +167,7 @@ class Manager:
             content_list = _content_sorted
             log.debug("Get content: last_id = %d" % _selector)
         else:
-            _selector = _random_select(content, samples=3)
+            _selector = _random_select(content, samples=50)
             content_list = content
             log.debug("Get content: rand = %d" % _selector)
         return None if not self._update_last_id_content \

@@ -15,6 +15,7 @@ requests = "*"
 aiohttp = "*"
 "dogpile.cache" = "*"
 sentry-sdk = "*"
+numpy = "*"
 
 [dev-packages]
 
