@@ -56,6 +56,7 @@ ALLOWED_HOSTS = ["*"] if DEBUG else [os.getenv("ALT_APP_DOMAIN")]
 
 INSTALLED_APPS = [
     'imager',
+    'django_admin_logs',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -143,6 +144,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ["https://%s" % os.getenv("ALT_APP_DOMAIN")]
 
+# allow for admin super-user delete logs
+DJANGO_ADMIN_LOGS_DELETABLE = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

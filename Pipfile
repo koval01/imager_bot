@@ -16,6 +16,7 @@ aiohttp = "*"
 "dogpile.cache" = "*"
 sentry-sdk = "*"
 numpy = "*"
+django-admin-logs = "*"
 
 [dev-packages]
 
