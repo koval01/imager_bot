@@ -45,6 +45,9 @@ class ContentAdmin(admin.ModelAdmin):
             updated,
         ) % updated, messages.SUCCESS)
 
+    def has_add_permission(self, request):
+        return False
+
     list_display = ('id', 'loader_id', 'type_content', 'moderated')
     list_filter = ('moderated', 'type_content')
     fields = ['media_tag', 'moderated', 'dislikes', 'type_content', 'loader_id', 'file_id']
@@ -102,6 +105,12 @@ class UserAdmin(admin.ModelAdmin):
         return format_html("<a{}>{}</a>", flatatt({"href": "//t.me/%s" % author}), author) \
             if author != "@Unknown" else author
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     list_display = (
         'id', 'user_id', 'tg_name_user', 'user_link',
         'banned', 'full_banned'
@@ -143,6 +152,15 @@ class LogEntryAdmin(admin.ModelAdmin):
         except Exception as e:
             log.debug("Error parsing change_message. Details: %s" % e)
             return "N/A"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     change_msg.__name__ = "Задействованные поля"
 
