@@ -20,14 +20,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 sentry_sdk.init(
     dsn=os.getenv("DJANGO_SENTRY"),
     integrations=[DjangoIntegration()],
-
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
     traces_sample_rate=1.0,
-
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
 )
 
@@ -56,7 +49,6 @@ ALLOWED_HOSTS = ["*"] if DEBUG else [os.getenv("ALT_APP_DOMAIN")]
 
 INSTALLED_APPS = [
     'imager',
-    'django_admin_logs',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -143,9 +135,6 @@ USE_TZ = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ["https://%s" % os.getenv("ALT_APP_DOMAIN")]
-
-# allow for admin super-user delete logs
-DJANGO_ADMIN_LOGS_DELETABLE = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
