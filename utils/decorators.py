@@ -10,6 +10,6 @@ def timer(func):
         start = time.perf_counter()
         result = func(*args, **kwargs)
         runtime = time.perf_counter() - start
-        log.debug(f"{func.__name__} took {runtime:.4f} secs")
+        log.info(f"Function {func.__name__} took {runtime:.4f} secs.")
         return result
     return _wrapper
