@@ -13,6 +13,6 @@ def timer(func):
         runtime = time.perf_counter() - start
         _ = Timer(func, runtime).write_result
         data = Timer(func).calc_avg()
-        log.info(f"Function {func.__name__} took average {data} seconds")
+        log.info(f"Function {func.__name__} took average {data['avg']:.3f} seconds")
         return result
     return _wrapper

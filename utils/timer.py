@@ -80,11 +80,14 @@ class Timer:
         data[self.name].append(self.time)
         return self._write_data(data)
 
-    def calc_avg(self, custom_handler: str = None) -> float:
+    def calc_avg(self, custom_handler: str = None) -> dict:
         _ = self._add_key
         _name = self.name if not custom_handler else custom_handler
         _data = self._read_data[_name]
-        return round(sum(_data) / len(_data), 4) if _data else 0
+        return {
+            "avg": sum(_data) / len(_data),
+            "min": min(_data), "max": max(_data)
+        } if _data else 0
 
     @property
     def all_handlers(self) -> dict:

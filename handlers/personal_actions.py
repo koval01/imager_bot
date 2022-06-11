@@ -49,7 +49,6 @@ async def test_log_handler(msg: types.Message):
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
-
     async def _send_messages() -> int:
         users = Manager().get_all_users_ids
         text = msg.get_args()
@@ -76,9 +75,14 @@ async def news_send_handler(msg: types.Message):
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
 async def timings_check(msg: types.Message):
     _data = Timer().all_handlers
-    answer = ["%s: %.4fs {%d}" % (
-        key, _data[key]["time"], _data[key]["len"]
-    ) for key in _data if key != "null"]
+    _template = "<i>%s</i>: <code>%.4f</code>/<code>%.4f</code>/<code>%.4f</code>"
+    answer = [
+        _template % (
+            key, _data[key]["time"]["avg"],
+            _data[key]["time"]["min"], _data[key]["time"]["max"]
+        ) for key in _data if key != "null"]
+    answer.insert(0, "-"*20)
+    answer.insert(0, _template % ("function", 0, 0, 0) + "\x20[min/avg/max]")
     await msg.reply("\n".join(answer))
 
 
