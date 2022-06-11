@@ -11,6 +11,7 @@ from content.loader import LoaderContent
 from content.manager import Manager
 from utils.throttling import rate_limit
 from utils.timer import Timer
+from typing import Tuple
 import logging as log
 
 
@@ -49,11 +50,13 @@ async def test_log_handler(msg: types.Message):
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
-    async def _send_messages() -> int:
+    async def _send_messages() -> Tuple[int, str]:
         users = Manager().get_all_users_ids
         text = msg.get_args()
         if len(text) > 3500:
-            return 0
+            return 0, ""
+        if not len(text):
+            return 0, "/news текст"
         successes = 0
         for user_id in users:
             try:
@@ -62,12 +65,14 @@ async def news_send_handler(msg: types.Message):
                 successes += 1
             except Exception as e:
                 log.info("Error send message. Details: %s" % e)
-        return successes
+        return successes, ""
 
     await msg.reply(dict_reply["init_news_send"])
-    successes_count = \
+    successes_count, text_result = \
         await _send_messages()
     if not successes_count:
+        if text_result:
+            return await msg.reply(text_result)
         return await msg.reply(dict_reply["news_send_error"])
     await msg.reply(dict_reply["finish_news_send"] % successes_count)
 
