@@ -78,8 +78,8 @@ async def timings_check(msg: types.Message):
     _template = "<i>%s</i>: <code>%.4f</code>/<code>%.4f</code>/<code>%.4f</code>"
     answer = [
         _template % (
-            key, _data[key]["time"]["avg"],
-            _data[key]["time"]["min"], _data[key]["time"]["max"]
+            key, _data[key]["time"]["min"],
+            _data[key]["time"]["avg"], _data[key]["time"]["max"]
         ) for key in _data if key != "null"]
     answer.insert(0, "-"*20)
     answer.insert(0, _template % ("function", 0, 0, 0) + "\x20[min/avg/max]")
