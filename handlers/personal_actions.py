@@ -58,7 +58,7 @@ async def news_send_handler(msg: types.Message):
         for user_id in users:
             try:
                 await bot.send_message(user_id, dict_reply["news_template"] % (
-                    text, msg.from_user.full_name))
+                    text, msg.from_user.full_name), disable_web_page_preview=False)
                 successes += 1
             except Exception as e:
                 log.info("Error send message. Details: %s" % e)
