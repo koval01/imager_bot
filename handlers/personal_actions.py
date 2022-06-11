@@ -122,14 +122,7 @@ async def wait_content_user_banned(msg: types.Message):
 ], state=TakeContent.wait_content)
 async def wait_content_handler(msg: types.Message):
     response_status = str(LoaderContent(msg))
-    if response_status != dict_reply["content_success"]:
-        return await msg.reply(response_status)
-    try:
-        await dp.throttle('start', rate=1.5)
-    except Throttled:
-        pass
-    else:
-        await msg.answer(response_status)
+    await msg.reply(response_status)
 
 
 @dp.message_handler(content_types=ContentType.DOCUMENT, state=TakeContent.wait_content)
