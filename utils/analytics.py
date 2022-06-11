@@ -7,6 +7,7 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler import current_handler
 from aiohttp import ClientSession
 from content.manager import Manager
+from utils.decorators import async_timer
 
 
 class Analytics:
@@ -20,6 +21,7 @@ class Analytics:
         self.host = "www.google-analytics.com"
         self.path = "mp/collect"
 
+    @async_timer
     async def _request_ga_server(self, params: dict, json: dict) -> None:
         async with ClientSession() as session:
             try:
