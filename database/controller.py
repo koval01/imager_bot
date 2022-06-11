@@ -2,11 +2,11 @@ from static import config
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-# from sqlalchemy.pool import SingletonThreadPool
+from sqlalchemy.pool import SingletonThreadPool
 
 
 engine = create_engine(
-    config.DATABASE_URL, max_overflow=47, pool_size=50
+    config.DATABASE_URL, poolclass=SingletonThreadPool, pool_size=18
 )
 _SessionFactory = sessionmaker(bind=engine)
 
