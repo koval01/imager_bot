@@ -100,7 +100,6 @@ class TelegramAPI:
             flatatt({"src": _path, "type": "audio/ogg"}),
             "Ваш браузер не поддерживает аудио элементы."
         )
-        print("data", _video, _img, _audio)
         return _video \
             if data["type"] == "video" \
             else (_img if data["type"] == "photo" else _audio)

@@ -10,6 +10,7 @@ from content.selector import Selector
 from content.loader import LoaderContent
 from content.manager import Manager
 from utils.throttling import rate_limit
+from utils.timer import Timer
 import logging as log
 
 
@@ -20,7 +21,7 @@ async def group_handler(msg: types.Message):
 
 
 @dp.message_handler(is_full_banned=True)
-@rate_limit(3, 'full_banned_user')
+@rate_limit(10, 'full_banned_user')
 async def full_banned_user(msg: types.Message):
     await msg.reply(dict_reply["full_ban"])
 
@@ -46,15 +47,19 @@ async def test_log_handler(msg: types.Message):
     log.info("Test log called from bot by admin.")
 
 
-@dp.message_handler(commands=['news'], is_moderator=True)
+@dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
 
     async def _send_messages() -> int:
         users = Manager().get_all_users_ids
+        text = msg.get_args()
+        if len(text) > 3500:
+            return 0
         successes = 0
         for user_id in users:
             try:
-                await bot.send_message(user_id, msg.get_args())
+                await bot.send_message(user_id, dict_reply["news_template"] % (
+                    text, msg.from_user.full_name))
                 successes += 1
             except Exception as e:
                 log.info("Error send message. Details: %s" % e)
@@ -63,7 +68,18 @@ async def news_send_handler(msg: types.Message):
     await msg.reply(dict_reply["init_news_send"])
     successes_count = \
         await _send_messages()
+    if not successes_count:
+        return await msg.reply(dict_reply["news_send_error"])
     await msg.reply(dict_reply["finish_news_send"] % successes_count)
+
+
+@dp.message_handler(commands=['timings'], state="*", is_moderator=True)
+async def timings_check(msg: types.Message):
+    _data = Timer().all_handlers
+    answer = ["%s: %.4fs {%d}" % (
+        key, _data[key]["time"], _data[key]["len"]
+    ) for key in _data if key != "null"]
+    await msg.reply("\n".join(answer))
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
@@ -137,7 +153,7 @@ async def invalid_select_get_mode(msg: types.Message):
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
-@rate_limit(0.5, 'next_content')
+@rate_limit(0.6, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
@@ -163,7 +179,7 @@ async def select_content_order_mode(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler()
-@rate_limit(0.5, 'any_data')
+@rate_limit(1, 'any_data')
 async def any_messages(msg: types.Message, state: FSMContext):
     await msg.reply(dict_reply["unknown_answer"], reply_markup=build_menu("start_menu"))
     await state.finish()

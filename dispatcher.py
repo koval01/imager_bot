@@ -9,6 +9,7 @@ from static.filters import IsOwnerFilter, IsModeratorFilter, \
 from static import config
 from utils.throttling import ThrottlingMiddleware
 from utils.analytics import AnalyticsMiddleware
+from utils.response_wait import ResponseWaitMiddleware
 
 # env init
 _is_debug_run = True if "debug_run" in sys.argv else False
@@ -29,6 +30,9 @@ storage = RedisStorage2(
 
 bot = Bot(token=config.BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher(bot, storage=storage)
+
+# middlewares list
+dp.middleware.setup(ResponseWaitMiddleware())
 dp.middleware.setup(LoggingMiddleware())
 dp.middleware.setup(ThrottlingMiddleware())
 dp.middleware.setup(AnalyticsMiddleware())

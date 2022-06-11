@@ -1,4 +1,5 @@
 import logging as log
+from utils.timer import Timer
 
 import functools
 import time
@@ -10,6 +11,8 @@ def timer(func):
         start = time.perf_counter()
         result = func(*args, **kwargs)
         runtime = time.perf_counter() - start
-        log.info(f"Function {func.__name__} took {runtime:.4f} secs.")
+        _ = Timer(func, runtime).write_result
+        data = Timer(func).calc_avg()
+        log.info(f"Function {func.__name__} took average {data} seconds")
         return result
     return _wrapper
