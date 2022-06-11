@@ -85,7 +85,7 @@ class Timer:
         _name = self.name if not custom_handler else custom_handler
         _data = self._read_data[_name]
         return {
-            "avg": sum(_data) / len(_data),
+            "avg": sum(_data) / len(_data), "len": len(_data),
             "min": min(_data), "max": max(_data)
         } if _data else 0
 
