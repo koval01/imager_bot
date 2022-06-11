@@ -15,7 +15,7 @@ class Timer:
         self.function = function
         self.name: str = function.__name__ if function else None
         self.time = round(time, 4)
-        self.max_key_len = 100
+        self.max_key_len = 1000
 
     def _decode_redis(self, src):
         if isinstance(src, list):
@@ -75,7 +75,7 @@ class Timer:
             return False
         _ = self._add_key
         data = self._read_data
-        if self._check_len(self.name):
+        if not self._check_len(self.name):
             data[self.name] = data[self.name][-abs(self.max_key_len):]
         data[self.name].append(self.time)
         return self._write_data(data)
