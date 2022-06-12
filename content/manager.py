@@ -160,13 +160,13 @@ class Manager:
     def _build_top_list(content: Content, users: User, len_: int = 10) -> List[dict]:
 
         def _sort_by_ids() -> Dict[list, Any]:
-            loaders = list(dict.fromkeys([u.loader_id for u in content]))
+            loaders = list(dict.fromkeys([u.loader_id for u in content[:]]))
             return {
                 loader: [
-                    c for c in content if c.loader_id == loader
+                    c for c in content[:] if c.loader_id == loader
                 ] for loader in loaders}
 
-        def _sort_users_by_len(users_dict: dict) -> List[Content]:
+        def _sort_users_by_len(users_dict: dict) -> list:
             return sorted(
                 [v for v in users_dict.items()],
                 key=lambda x: len(x[1]), reverse=True
@@ -175,7 +175,7 @@ class Manager:
         def _get_user_name(user_id: int) -> str:
             return [
                 user.tg_name_user
-                for user in users
+                for user in users[:]
                 if user.user_id == user_id
             ][0]
 
@@ -195,10 +195,10 @@ class Manager:
 
     @property
     def get_top(self) -> str:
-        return "\n".join([
+        return "%s\n(%s)" % ("\n".join([
             line["message"] for line in self._build_top_list(
                 self._get_all_content(moderated=True), self._get_all_users)
-        ])
+        ]), msg_dict["top_list_comment"])
 
     @property
     def _get_content(self) -> tuple or None:
