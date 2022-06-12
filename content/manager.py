@@ -162,14 +162,14 @@ class Manager:
         def _sort_by_ids() -> Dict[list, Any]:
             loaders = list(dict.fromkeys([u.loader_id for u in content[:]]))
             return {
-                loader: [
-                    c for c in content[:] if c.loader_id == loader
-                ] for loader in loaders}
+                loader: len([
+                    1 for c in content[:] if c.loader_id == loader
+                ]) for loader in loaders}
 
         def _sort_users_by_len(users_dict: dict) -> list:
             return sorted(
                 [v for v in users_dict.items()],
-                key=lambda x: len(x[1]), reverse=True
+                key=lambda x: x[1], reverse=True
             )
 
         def _get_user_name(user_id: int) -> str:
@@ -184,7 +184,7 @@ class Manager:
         return [
             {
                 "message": _template % (
-                    i + 1, _get_user_name(_users[i][0]), len(_users[i][1])),
+                    i + 1, _get_user_name(_users[i][0]), _users[i][1]),
                 "data": {
                     "index": i,
                     "user": _users[i]
