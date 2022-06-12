@@ -107,8 +107,8 @@ class Timer:
         _data = self.all_handlers
         _system_data = {"memory": SystemData().memory(), "cpu": SystemData().cpu()}
         _template = "{%d} <i>%s</i>: " \
-                    "<code>%.3f</code>/<code>%.3f</code>/<code>%.3f</code>/" \
-                    "<code>%.3f</code>/<code>%.3f</code>"
+                    "<code>%.4f</code>/<code>%.4f</code>/<code>%.4f</code>/" \
+                    "<code>%.4f</code>/<code>%.4f</code>"
         answer = [
             _template % (
                 _data[key]["time"]["len"], key, _data[key]["time"]["min"],
