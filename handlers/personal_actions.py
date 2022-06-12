@@ -88,6 +88,7 @@ async def init_select(msg: types.Message):
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
+@rate_limit(2, 'top_content_loaders_list')
 async def top_content_loaders_list(msg: types.Message):
     await msg.reply(Manager().get_top)
 
