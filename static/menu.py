@@ -4,7 +4,7 @@ from aiogram.types import ReplyKeyboardRemove, \
 
 
 dictionary = {
-    "start_menu": ["Смотреть", "Добавить"],
+    "start_menu": ["Смотреть", "Добавить", "Топ"],
     "select_mode": ["Фото", "Видео", "Голосовые"],
     "cancel": ["🙅‍♂️"],
     "next_content": ["🙅‍♂️", "➡️"],

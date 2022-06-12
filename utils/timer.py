@@ -1,6 +1,8 @@
 from typing import Callable
 from static.config import REDIS_URL
+from utils.system_data import SystemData
 import logging as log
+import numpy as np
 import redis
 import json
 
@@ -84,9 +86,13 @@ class Timer:
         _ = self._add_key
         _name = self.name if not custom_handler else custom_handler
         _data = self._read_data[_name]
+        _np_data = np.array(_data)
         return {
             "avg": sum(_data) / len(_data), "len": len(_data),
-            "min": min(_data), "max": max(_data)
+            "min": min(_data), "max": max(_data), "percentage": {
+                "50": np.percentile(_np_data, 50),
+                "95": np.percentile(_np_data, 95)
+            }
         } if _data else 0
 
     @property
@@ -95,3 +101,28 @@ class Timer:
         return {key: {
             "time": self.calc_avg(key), "len": len_
         } for key, len_ in _data}
+
+    @property
+    def build_response(self) -> str:
+        _data = self.all_handlers
+        _system_data = {"memory": SystemData().memory(), "cpu": SystemData().cpu()}
+        _template = "{%d} <i>%s</i>: " \
+                    "<code>%.3f</code>/<code>%.3f</code>/<code>%.3f</code>/" \
+                    "<code>%.3f</code>/<code>%.3f</code>"
+        answer = [
+            _template % (
+                _data[key]["time"]["len"], key, _data[key]["time"]["min"],
+                _data[key]["time"]["avg"], _data[key]["time"]["max"],
+                _data[key]["time"]["percentage"]["50"],
+                _data[key]["time"]["percentage"]["95"]
+            ) for key in _data if key != "null"]
+        answer.insert(0, "-" * 20)
+        answer.insert(0, "{len} <i>function</i>: "
+                         "<code>min</code>/<code>avg</code>/<code>max</code>/"
+                         "<code>50%</code>/<code>95%</code>")
+        answer.append("-" * 20)
+        answer.append("CPU: %d%%; MEM: %s/%s (%d%%)" % (
+            _system_data["cpu"], _system_data["memory"]["used_space"], _system_data["memory"]["total_space"],
+            _system_data["memory"]["used_perc"]
+        ))
+        return "\n".join(answer)

@@ -1,7 +1,6 @@
 from aiogram import types
 from aiogram.types import ChatType, ContentType
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.exceptions import Throttled
 from dispatcher import dp, bot
 from static.messages import dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
@@ -79,22 +78,18 @@ async def news_send_handler(msg: types.Message):
 
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
 async def timings_check(msg: types.Message):
-    _data = Timer().all_handlers
-    _template = "{%d} <i>%s</i>: <code>%.4f</code>/<code>%.4f</code>/<code>%.4f</code>"
-    answer = [
-        _template % (
-            _data[key]["time"]["len"], key, _data[key]["time"]["min"],
-            _data[key]["time"]["avg"], _data[key]["time"]["max"]
-        ) for key in _data if key != "null"]
-    answer.insert(0, "-"*20)
-    answer.insert(0, "{len} <i>function</i>: <code>min</code>/<code>avg</code>/<code>max</code>")
-    await msg.reply("\n".join(answer))
+    await msg.reply(Timer().build_response)
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
 async def init_select(msg: types.Message):
     await ViewContent.select_mode.set()
     await msg.reply(dict_reply["select_mode"], reply_markup=build_menu("select_mode"))
+
+
+@dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
+async def top_content_loaders_list(msg: types.Message):
+    await msg.reply(Manager().get_top)
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1], is_banned=True)

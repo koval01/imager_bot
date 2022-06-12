@@ -34,5 +34,6 @@ dictionary = {
     "rand_or_last": "Как выдавать контент?",
     "rand_or_last_error_select": "Ошибка. Неверный вариант выдачи контента.",
     "news_send_error": "Не удалось разослать сообщение, возможно оно слишком длинное.",
-    "news_template": "%s\n\nОтправил: %s"
+    "news_template": "%s\n\nОтправил: %s",
+    "top_list_template": "%d. %s - %d медиа"
 }

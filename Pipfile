@@ -17,6 +17,7 @@ aiohttp = "*"
 sentry-sdk = "*"
 numpy = "*"
 redis = "*"
+psutil = "*"
 
 [dev-packages]
 

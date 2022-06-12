@@ -1,12 +1,13 @@
 import copy
 
-from typing import List
+from typing import List, Dict, Any
 
 from database.controller import session_factory
 from database.models import Content, User
 from aiogram.types import Message
 from database.caching_query import FromCache
 from utils.decorators import timer
+from static.messages import dictionary as msg_dict
 import logging as log
 import numpy as np
 
@@ -138,6 +139,14 @@ class Manager:
         self.session.close()
         return data
 
+    @timer
+    def _get_all_content(self, moderated: bool = True) -> Content:
+        data = self.session.query(Content).options(
+            FromCache("get_all_content", expiration_time=600)
+        ).filter_by(moderated=moderated)
+        self.session.close()
+        return data
+
     @staticmethod
     @timer
     def _sort_content(content: Content) -> List[Content]:
@@ -145,6 +154,51 @@ class Manager:
             [el for el in copy.deepcopy(content.all())],
             key=lambda x: x.id, reverse=False
         )
+
+    @staticmethod
+    @timer
+    def _build_top_list(content: Content, users: User, len_: int = 10) -> List[dict]:
+
+        def _sort_by_ids() -> Dict[list, Any]:
+            loaders = list(dict.fromkeys([u.loader_id for u in content]))
+            return {
+                loader: [
+                    c for c in content if c.loader_id == loader
+                ] for loader in loaders}
+
+        def _sort_users_by_len(users_dict: dict) -> List[Content]:
+            return sorted(
+                [v for v in users_dict.items()],
+                key=lambda x: len(x[1]), reverse=True
+            )
+
+        def _get_user_name(user_id: int) -> str:
+            return [
+                user.tg_name_user
+                for user in users
+                if user.user_id == user_id
+            ][0]
+
+        _template = msg_dict["top_list_template"]
+        _users = _sort_users_by_len(_sort_by_ids())
+        return [
+            {
+                "message": _template % (
+                    i + 1, _get_user_name(_users[i][0]), len(_users[i][1])),
+                "data": {
+                    "index": i,
+                    "user": _users[i]
+                }
+            }
+            for i in range(len_)
+        ]
+
+    @property
+    def get_top(self) -> str:
+        return "\n".join([
+            line["message"] for line in self._build_top_list(
+                self._get_all_content(moderated=True), self._get_all_users)
+        ])
 
     @property
     def _get_content(self) -> tuple or None:
