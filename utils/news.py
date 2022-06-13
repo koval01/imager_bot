@@ -1,7 +1,7 @@
 from content.manager import Manager
 from aiogram import types, Bot
 from typing import Tuple
-from static.menu import dictionary as dict_reply
+from static.messages import dictionary as dict_reply
 import logging as log
 
 
