@@ -1,4 +1,6 @@
 from static.menu import dictionary as menu_dict
+from static.menu import donate_inline_button
+from random import uniform as float_rand
 
 dictionary = {
     "start_message": "Привет. Воспользовавшись меню ниже, ты можешь получить "
@@ -36,5 +38,13 @@ dictionary = {
     "news_send_error": "Не удалось разослать сообщение, возможно оно слишком длинное.",
     "news_template": "%s\n\nОтправил: %s",
     "top_list_template": "%d. %s - %d медиа",
-    "top_list_comment": "Учитывается контент прошедший модерацию и сейчас отображается в выдаче."
+    "top_list_comment": "Учитывается контент прошедший модерацию и сейчас отображается в выдаче.",
+    "donate_template": "Ты можешь поддержать бота финансово, чтобы он мог дальше работать и обновлятся. "
+                       "Люди которые задонатили больше <code>100</code> гривен - "
+                       "<b>будут упомянуты в новостях бота</b>. "
+                       "<i>Ниже кнопка для перехода на страницу доната</i>."
 }
+
+def donate_answer(random: bool = False) -> (dict, bool):
+    return (dict(text=dictionary["donate_template"], reply_markup=donate_inline_button), True) \
+        if not random or float_rand(0, 1) > 0.8 else (None, False)

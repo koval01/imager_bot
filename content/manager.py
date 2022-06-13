@@ -159,32 +159,37 @@ class Manager:
     @timer
     def _build_top_list(content: Content, users: User, len_: int = 10) -> List[dict]:
 
-        def _sort_by_ids() -> Dict[list, Any]:
+        @timer
+        def _sort_by_ids_top_list() -> Dict[list, Any]:
             loaders = list(dict.fromkeys([u.loader_id for u in content[:]]))
             return {
                 loader: len([
-                    1 for c in content[:] if c.loader_id == loader
+                    c.id for c in content[:] if c.loader_id == loader
                 ]) for loader in loaders}
 
-        def _sort_users_by_len(users_dict: dict) -> list:
+        @timer
+        def _sort_users_by_len_top(users_dict: dict) -> list:
             return sorted(
                 [v for v in users_dict.items()],
                 key=lambda x: x[1], reverse=True
             )
 
-        def _get_user_name(user_id: int) -> str:
+        @timer
+        def _get_user_name_top(user_id: int, users_: list) -> str:
             return [
                 user.tg_name_user
-                for user in users[:]
+                for user in users_[:]
                 if user.user_id == user_id
             ][0]
 
         _template = msg_dict["top_list_template"]
-        _users = _sort_users_by_len(_sort_by_ids())
+        _users = _sort_users_by_len_top(_sort_by_ids_top_list())
+        _users_array = users[:]
+
         return [
             {
                 "message": _template % (
-                    i + 1, _get_user_name(_users[i][0]), _users[i][1]),
+                    i + 1, _get_user_name_top(_users[i][0], _users_array), _users[i][1]),
                 "data": {
                     "index": i,
                     "user": _users[i]

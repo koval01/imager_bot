@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.types import ChatType, ContentType
 from aiogram.dispatcher import FSMContext
 from dispatcher import dp, bot
-from static.messages import dictionary as dict_reply
+from static.messages import donate_answer, dictionary as dict_reply
 from static.menu import build_menu, dictionary as dict_menu
 from handlers.fsm import ViewContent, TakeContent
 from content.selector import Selector
@@ -93,6 +93,12 @@ async def top_content_loaders_list(msg: types.Message):
     await msg.reply(Manager().get_top)
 
 
+@dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][3])
+@rate_limit(1, 'get_donate_link')
+async def get_donate_link(msg: types.Message):
+    await msg.reply(**donate_answer()[0])
+
+
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1], is_banned=True)
 @rate_limit(2, 'banned_user_init_load_content')
 async def banned_user_init_load_content(msg: types.Message):
@@ -156,6 +162,8 @@ async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
         await Selector(msg, data["order_mode"]).reply_selector
+        donate_ = donate_answer(random=True)
+        await msg.answer(**donate_[0]) if donate_[1] else None
 
 
 @dp.message_handler(lambda message: message.text in dict_menu["select_mode"], state=ViewContent.select_mode)
