@@ -47,4 +47,4 @@ dictionary = {
 
 def donate_answer(random: bool = False) -> (dict, bool):
     return (dict(text=dictionary["donate_template"], reply_markup=donate_inline_button), True) \
-        if not random or float_rand(0, 1) > 0.8 else (None, False)
+        if not random or float_rand(0, 1) > 0.9 else (None, False)
