@@ -10,7 +10,7 @@ from content.loader import LoaderContent
 from content.manager import Manager
 from utils.throttling import rate_limit
 from utils.timer import Timer
-from typing import Tuple
+from utils.news import NewsSend
 import logging as log
 
 
@@ -49,34 +49,11 @@ async def test_log_handler(msg: types.Message):
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
-    async def _send_messages() -> Tuple[int, str]:
-        users = await Manager().get_all_users_ids
-        text = msg.get_args()
-        if len(text) > 3500:
-            return 0, ""
-        if not len(text):
-            return 0, "/news текст"
-        successes = 0
-        for user_id in users:
-            try:
-                await bot.send_message(user_id, dict_reply["news_template"] % (
-                    text, msg.from_user.full_name), disable_web_page_preview=False)
-                successes += 1
-            except Exception as e:
-                log.info("Error send message. Details: %s" % e)
-        return successes, ""
-
-    await msg.reply(dict_reply["init_news_send"])
-    successes_count, text_result = \
-        await _send_messages()
-    if not successes_count:
-        if text_result:
-            return await msg.reply(text_result)
-        return await msg.reply(dict_reply["news_send_error"])
-    await msg.reply(dict_reply["finish_news_send"] % successes_count)
+    return NewsSend(message=msg, bot=bot).execute()
 
 
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
+@dp.async_task
 async def timings_check(msg: types.Message):
     await msg.reply(Timer().build_response)
 
@@ -88,6 +65,7 @@ async def init_select(msg: types.Message):
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
+@dp.async_task
 @rate_limit(2.5, 'top_content_loaders_list')
 async def top_content_loaders_list(msg: types.Message):
     await msg.reply(await Manager().get_top)
@@ -185,6 +163,7 @@ async def select_content_order_mode(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler()
+@dp.async_task
 @rate_limit(1, 'any_data')
 async def any_messages(msg: types.Message, state: FSMContext):
     await msg.reply(dict_reply["unknown_answer"], reply_markup=build_menu("start_menu"))
