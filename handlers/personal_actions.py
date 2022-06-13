@@ -66,7 +66,7 @@ async def init_select(msg: types.Message):
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
 @dp.async_task
-@rate_limit(2.5, 'top_content_loaders_list')
+@rate_limit(2, 'top_content_loaders_list')
 async def top_content_loaders_list(msg: types.Message):
     await msg.reply(await Manager().get_top)
 
@@ -135,7 +135,7 @@ async def invalid_select_get_mode(msg: types.Message):
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
-@rate_limit(0.7, 'next_content')
+@rate_limit(0.5, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
