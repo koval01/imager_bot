@@ -50,7 +50,7 @@ async def test_log_handler(msg: types.Message):
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
     async def _send_messages() -> Tuple[int, str]:
-        users = Manager().get_all_users_ids
+        users = await Manager().get_all_users_ids
         text = msg.get_args()
         if len(text) > 3500:
             return 0, ""
@@ -90,7 +90,7 @@ async def init_select(msg: types.Message):
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
 @rate_limit(2.5, 'top_content_loaders_list')
 async def top_content_loaders_list(msg: types.Message):
-    await msg.reply(Manager().get_top)
+    await msg.reply(await Manager().get_top)
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][3])
