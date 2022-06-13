@@ -49,7 +49,7 @@ async def test_log_handler(msg: types.Message):
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
-    return NewsSend(message=msg, bot=bot).execute()
+    return await NewsSend(message=msg, bot=bot).execute()
 
 
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
