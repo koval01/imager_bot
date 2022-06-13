@@ -133,8 +133,8 @@ class Manager:
         return data
 
     @staticmethod
-    @timer
-    def _sort_content(content: Content) -> List[Content]:
+    @async_timer
+    async def _sort_content(content: Content) -> List[Content]:
         return sorted(
             [el for el in copy.deepcopy(content.all())],
             key=lambda x: x.id, reverse=False
@@ -194,7 +194,7 @@ class Manager:
         ]), msg_dict["top_list_comment"])
 
     @property
-    def _get_content(self) -> tuple or None:
+    async def _get_content(self) -> tuple or None:
 
         @timer
         def _random_select(content_data: list, samples: int = 10) -> int:
@@ -205,7 +205,7 @@ class Manager:
         content = self._get_content_query
         log.debug("Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
-            _content_sorted = self._sort_content(content)
+            _content_sorted = await self._sort_content(content)
             _selector = self._get_last_id
             try:
                 content[_selector]
@@ -249,10 +249,6 @@ class Manager:
             return False
 
     @property
-    def get_content(self) -> tuple:
-        data = self._get_content
+    async def get_content(self) -> tuple:
+        data = await self._get_content
         return data if data.__class__.__name__ == "tuple" else (None, None)
-
-    def __str__(self) -> str:
-        data = self._get_content
-        return data

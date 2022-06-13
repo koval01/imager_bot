@@ -28,7 +28,7 @@ class Selector:
     async def reply_selector(self) -> Message:
         try:
             type_ = self.select_type
-            content_id, file_id = Manager(
+            content_id, file_id = await Manager(
                 type_content=type_, message=self.msg, get_content_random=self._select_order_mode
             ).get_content
             log.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
