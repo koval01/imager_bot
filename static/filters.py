@@ -41,7 +41,7 @@ class IsBannedFilter(BoundFilter):
         self.is_banned = is_banned
 
     async def check(self, message: types.Message):
-        return Manager(message=message).check_ban
+        return await Manager(message=message).check_ban
 
 
 class IsFullBannedFilter(BoundFilter):
@@ -54,4 +54,4 @@ class IsFullBannedFilter(BoundFilter):
         self.is_full_banned = is_full_banned
 
     async def check(self, message: types.Message):
-        return Manager(message=message).check_full_ban
+        return await Manager(message=message).check_full_ban

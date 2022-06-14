@@ -11,7 +11,6 @@ import json
 
 
 class MyAdminSite(admin.AdminSite):
-    # Disable View on Site link on admin page
     site_url = None
 
 
@@ -21,8 +20,11 @@ class TelegramInline(admin.StackedInline):
     verbose_name_plural = 'telegram'
 
 
-class TelegramAdmin(BaseUserAdmin):
+class UserDjangoAdmin(BaseUserAdmin):
     inlines = (TelegramInline,)
+
+    # def has_change_permission(self, request, obj=None):
+    #     return True
 
 
 class ContentAdmin(admin.ModelAdmin):
@@ -171,6 +173,6 @@ admin.site.site_header = 'Imager'
 admin.site.site_title = "Панель администратора"
 
 admin.site.unregister(User_DJ)
-admin.site.register(User_DJ, TelegramAdmin)
+admin.site.register(User_DJ, UserDjangoAdmin)
 
 admin.site.register(LogEntry, LogEntryAdmin)

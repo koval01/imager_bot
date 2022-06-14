@@ -52,22 +52,22 @@ class Manager:
         return [user.user_id for user in await self._get_all_users]
 
     @property
-    def check_ban(self) -> bool:
-        if self.check_user:
+    async def check_ban(self) -> bool:
+        if await self.check_user():
             return True if self._get_user.banned else False
         return False
 
     @property
-    def check_full_ban(self) -> bool:
-        if self.check_user:
+    async def check_full_ban(self) -> bool:
+        if await self.check_user():
             return True if self._get_user.full_banned else False
         return False
 
-    @timer
-    def check_user(self) -> bool:
+    @async_timer
+    async def check_user(self) -> bool:
         user = self._get_user
         if not user:
-            return True if self._add_user else False
+            return True if await self._add_user else False
         elif (user.tg_name_user != self.message.from_user.full_name) \
                 or (user.tg_username_user != self.message.from_user.username and (
                 self.message.from_user.username)):
@@ -94,8 +94,8 @@ class Manager:
             return False
 
     @property
-    @timer
-    def _add_user(self) -> bool:
+    @async_timer
+    async def _add_user(self) -> bool:
         try:
             self.session.add(User(
                 user_id=self.user_id,

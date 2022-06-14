@@ -68,7 +68,7 @@ class AnalyticsMiddleware(BaseMiddleware):
 
     @staticmethod
     async def _update_user(message: Message) -> None:
-        user_check = Manager(message=message).check_user
+        user_check = await Manager(message=message).check_user()
         log.debug("Error check user. (Google Analytics middleware)") if not user_check else None
 
     async def on_process_message(self, message: Message, data: dict):
