@@ -74,6 +74,9 @@ class AnalyticsMiddleware(BaseMiddleware):
     async def on_process_message(self, message: Message, data: dict):
         handler = current_handler.get()
         dispatcher = Dispatcher.get_current()
-        _debug_data = [handler.__name__, dispatcher, message, data]
+        log.debug(
+            "Analytics middleware (debug data): %s" %
+            [handler.__name__, dispatcher, message, data]
+        )
         await self._update_user(message)
         await Analytics(message=message, alt_action=handler.__name__).send
