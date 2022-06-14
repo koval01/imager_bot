@@ -24,6 +24,7 @@ class TelegramInline(admin.StackedInline):
 class UserDjangoAdmin(BaseUserAdmin):
     inlines = (TelegramInline,)
     readonly_fields = ("is_superuser",)
+    list_display = ("username", "is_staff", "is_active", "last_login")
 
     def has_change_permission(self, request, obj=None):
         body = parse_qs(request.body.decode("utf-8"))
