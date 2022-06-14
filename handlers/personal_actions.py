@@ -147,8 +147,8 @@ async def invalid_select_get_mode(msg: types.Message):
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         msg.text = data["select"]
-        await Selector(msg, data["order_mode"]).reply_selector
-        donate_ = donate_answer(random=True)
+        await Selector(msg, data["order_mode"]).reply_selector()
+        donate_ = await donate_answer(random=True)
         await msg.answer(**donate_[0]) if donate_[1] else None
 
 

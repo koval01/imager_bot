@@ -26,26 +26,20 @@ class Manager:
     @property
     @timer
     def _get_user(self) -> User or None:
-        try:
-            data = self.session.query(User).options(
-                FromCache("get_user", expiration_time=300)
-            ).filter_by(
-                user_id=self.user_id).one()
-            self.session.close()
-            return data
-        except Exception as e:
-            log.error("Error get user. Details: %s" % e)
+        data = self.session.query(User).options(
+            FromCache("get_user", expiration_time=300)
+        ).filter_by(
+            user_id=self.user_id).one()
+        self.session.close()
+        return data
 
     @property
     @async_timer
     async def _get_all_users(self) -> List[User] or None:
-        try:
-            data = self.session.query(User).options(
-                FromCache("get_all_users", expiration_time=180)).all()
-            self.session.close()
-            return data
-        except Exception as e:
-            log.error("Error get user. Details: %s" % e)
+        data = self.session.query(User).options(
+            FromCache("get_all_users", expiration_time=180)).all()
+        self.session.close()
+        return data
 
     @property
     async def get_all_users_ids(self) -> List[int] or None:
@@ -89,6 +83,7 @@ class Manager:
             )
             self.session.commit()
             self.session.close()
+            return True
         except Exception as e:
             log.warning("Error update user. Details: %s" % e)
             return False

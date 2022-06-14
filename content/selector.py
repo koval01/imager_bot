@@ -24,7 +24,6 @@ class Selector:
         _mode = lambda x: self.text_order_mode == menu_dict["rand_or_last"][x]
         return True if _mode(0) else (False if _mode(1) else None)
 
-    @property
     async def reply_selector(self) -> Message:
         try:
             type_ = self.select_type
