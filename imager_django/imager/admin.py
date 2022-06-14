@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from django.utils.translation import ngettext
 from django.forms.utils import flatatt
 from .models import Content, User, Telegram
+from urllib.parse import parse_qs
 import logging as log
 import json
 
@@ -22,9 +23,18 @@ class TelegramInline(admin.StackedInline):
 
 class UserDjangoAdmin(BaseUserAdmin):
     inlines = (TelegramInline,)
+    readonly_fields = ("is_superuser",)
 
-    # def has_change_permission(self, request, obj=None):
-    #     return True
+    def has_change_permission(self, request, obj=None):
+        body = parse_qs(request.body.decode("utf-8"))
+        if "is_superuser" in body or (obj.is_superuser if obj else None):
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        if obj.is_superuser if obj else None:
+            return False
+        return True
 
 
 class ContentAdmin(admin.ModelAdmin):
