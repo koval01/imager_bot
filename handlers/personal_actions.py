@@ -104,6 +104,7 @@ async def wait_content_user_banned(msg: types.Message):
 @dp.message_handler(content_types=[
     ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
 ], state=TakeContent.wait_content)
+@dp.async_task
 async def wait_content_handler(msg: types.Message):
     response_status = str(LoaderContent(msg))
     await msg.reply(response_status)
