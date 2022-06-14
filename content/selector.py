@@ -34,9 +34,10 @@ class Selector:
             if not content_id or not file_id:
                 return await self.msg.reply(dict_reply["no_content"])
             else:
+                menu = await build_menu("next_content")
                 return await eval(
                     f"self.msg.reply_{type_}(file_id, "
-                    f"caption=str(content_id), reply_markup=await build_menu(\"next_content\"))"
+                    f"caption=str(content_id), reply_markup=menu)"
                 )
         except Exception as e:
             return await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
