@@ -30,14 +30,16 @@ async def full_banned_user(msg: types.Message):
     ViewContent.view_mode, TakeContent.wait_content
 ])
 async def cancel_action(msg: types.Message, state: FSMContext):
-    await msg.reply(dict_reply["canceled_action"], reply_markup=build_menu("start_menu"))
+    await msg.reply(dict_reply["canceled_action"],
+                    reply_markup=await build_menu("start_menu"))
     await state.finish()
 
 
 @dp.message_handler(commands=['start', 'help'], state="*")
 @rate_limit(2, 'start_command')
 async def send_welcome(msg: types.Message, state: FSMContext):
-    await msg.reply(dict_reply["start_message"], reply_markup=build_menu("start_menu"))
+    await msg.reply(dict_reply["start_message"],
+                    reply_markup=await build_menu("start_menu"))
     await state.finish()
 
 
@@ -61,7 +63,8 @@ async def timings_check(msg: types.Message):
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
 async def init_select(msg: types.Message):
     await ViewContent.select_mode.set()
-    await msg.reply(dict_reply["select_mode"], reply_markup=build_menu("select_mode"))
+    await msg.reply(dict_reply["select_mode"],
+                    reply_markup=await build_menu("select_mode"))
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
@@ -86,7 +89,8 @@ async def banned_user_init_load_content(msg: types.Message):
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1])
 async def init_load_content(msg: types.Message):
     await TakeContent.wait_content.set()
-    await msg.reply(dict_reply["take_content"], reply_markup=build_menu("cancel"))
+    await msg.reply(dict_reply["take_content"],
+                    reply_markup=await build_menu("cancel"))
 
 
 @dp.message_handler(content_types=[
@@ -118,20 +122,23 @@ async def wait_content_handler_invalid_type(msg: types.Message):
 @dp.message_handler(lambda message: message.text not in dict_menu["select_mode"], state=ViewContent.select_mode)
 @rate_limit(1, 'error_select_content_type')
 async def invalid_select_content(msg: types.Message):
-    await msg.reply(dict_reply["error_select"], reply_markup=build_menu("select_mode"))
+    await msg.reply(dict_reply["error_select"],
+                    reply_markup=await build_menu("select_mode"))
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["next_content"], state=ViewContent.view_mode)
 @rate_limit(1, 'error_select_content_action')
 async def invalid_select_action(msg: types.Message):
-    await msg.reply(dict_reply["error_action"], reply_markup=build_menu("next_content"))
+    await msg.reply(dict_reply["error_action"],
+                    reply_markup=await build_menu("next_content"))
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["rand_or_last"],
                     state=ViewContent.select_mode_stage_two)
 @rate_limit(1, 'error_select_get_mode')
 async def invalid_select_get_mode(msg: types.Message):
-    await msg.reply(dict_reply["rand_or_last_error_select"], reply_markup=build_menu("rand_or_last"))
+    await msg.reply(dict_reply["rand_or_last_error_select"],
+                    reply_markup=await build_menu("rand_or_last"))
 
 
 @dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
@@ -148,7 +155,8 @@ async def next_action(msg: types.Message, state: FSMContext):
 async def select_content(msg: types.Message, state: FSMContext):
     await ViewContent.select_mode_stage_two.set()
     await state.update_data(select=msg.text)
-    await msg.reply(dict_reply["rand_or_last"], reply_markup=build_menu("rand_or_last"))
+    await msg.reply(dict_reply["rand_or_last"],
+                    reply_markup=await build_menu("rand_or_last"))
 
 
 @dp.message_handler(lambda message: message.text in dict_menu["rand_or_last"],
@@ -156,7 +164,8 @@ async def select_content(msg: types.Message, state: FSMContext):
 async def select_content_order_mode(msg: types.Message, state: FSMContext):
     await ViewContent.view_mode.set()
     await state.update_data(order_mode=msg.text)
-    await msg.reply(dict_reply["view_content"], reply_markup=build_menu("next_content"))
+    await msg.reply(dict_reply["view_content"],
+                    reply_markup=await build_menu("next_content"))
     async with state.proxy() as data:
         msg.text = data["select"]
         await Selector(msg, data["order_mode"]).reply_selector
@@ -166,5 +175,6 @@ async def select_content_order_mode(msg: types.Message, state: FSMContext):
 @dp.async_task
 @rate_limit(1, 'any_data')
 async def any_messages(msg: types.Message, state: FSMContext):
-    await msg.reply(dict_reply["unknown_answer"], reply_markup=build_menu("start_menu"))
+    await msg.reply(dict_reply["unknown_answer"],
+                    reply_markup=await build_menu("start_menu"))
     await state.finish()

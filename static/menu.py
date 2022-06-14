@@ -16,7 +16,7 @@ donate_inline_button = InlineKeyboardMarkup().add(
     InlineKeyboardButton('Донат', url=DONATE_LINK)
 )
 
-def build_menu(name: str) -> ReplyKeyboardMarkup:
+async def build_menu(name: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False).add(
         *tuple(KeyboardButton(e) for e in dictionary[name])
     )
