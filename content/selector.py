@@ -12,7 +12,7 @@ class Selector:
         self.text_order_mode = text_order_mode
 
     @property
-    def select_type(self) -> str:
+    async def select_type(self) -> str:
         return [
             ["photo", "video", "voice"][i]
             for i, x in enumerate(menu_dict["select_mode"])
@@ -20,15 +20,16 @@ class Selector:
         ][0]
 
     @property
-    def _select_order_mode(self) -> bool or None:
-        _mode = lambda x: self.text_order_mode == menu_dict["rand_or_last"][x]
-        return True if _mode(0) else (False if _mode(1) else None)
+    async def _select_order_mode(self) -> bool or None:
+        order_mode = lambda x: self.text_order_mode == menu_dict["rand_or_last"][x]
+        return True if order_mode(0) else (False if order_mode(1) else None)
 
     async def reply_selector(self) -> Message:
         try:
-            type_ = self.select_type
+            type_ = await self.select_type
             content_id, file_id = await Manager(
-                type_content=type_, message=self.msg, get_content_random=self._select_order_mode
+                type_content=type_, message=self.msg,
+                get_content_random=await self._select_order_mode
             ).get_content
             log.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
