@@ -169,7 +169,7 @@ async def select_content_order_mode(msg: types.Message, state: FSMContext):
                     reply_markup=await build_menu("next_content"))
     async with state.proxy() as data:
         msg.text = data["select"]
-        await Selector(msg, data["order_mode"]).reply_selector
+        await Selector(msg, data["order_mode"]).reply_selector()
 
 
 @dp.message_handler()

@@ -32,12 +32,12 @@ class Selector:
             ).get_content
             log.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
-                await self.msg.reply(dict_reply["no_content"])
+                return await self.msg.reply(dict_reply["no_content"])
             else:
-                await eval(
+                return await eval(
                     f"self.msg.reply_{type_}(file_id, "
                     f"caption=str(content_id), reply_markup=build_menu(\"next_content\"))"
                 )
         except Exception as e:
-            await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
+            return await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
             log.error("Error send content (selector). Details: %s" % e)
