@@ -50,6 +50,7 @@ async def test_log_handler(msg: types.Message):
 
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
+@dp.async_task
 async def news_send_handler(msg: types.Message):
     return await NewsSend(message=msg, bot=bot).execute()
 
@@ -75,9 +76,11 @@ async def top_content_loaders_list(msg: types.Message):
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][3])
+@dp.async_task
 @rate_limit(1, 'get_donate_link')
 async def get_donate_link(msg: types.Message):
-    await msg.reply(**donate_answer()[0])
+    _answer = await donate_answer()
+    await msg.reply(**_answer[0])
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1], is_banned=True)
