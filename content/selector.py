@@ -2,6 +2,7 @@ from static.menu import build_menu, dictionary as menu_dict
 from static.messages import dictionary as dict_reply
 from aiogram.types import Message, ReplyKeyboardMarkup
 from content.manager import Manager
+from static.config import DISLIKE_DISABLED
 import logging as log
 
 
@@ -33,6 +34,9 @@ class Selector:
                 return await self.msg.reply(
                     dict_reply["dislike_sent_error"], reply_markup=menu_)
             elif dislike_process != "skip":
+                if DISLIKE_DISABLED:
+                    return await self.msg.reply(
+                        dict_reply["error_action"], reply_markup=menu_)
                 return await self.msg.reply(
                     dict_reply["dislike_sent"], reply_markup=menu_)
 
@@ -46,7 +50,7 @@ class Selector:
             if not content_id or not file_id:
                 return await self.msg.reply(dict_reply["no_content"])
             menu = await build_menu("next_content")
-            # await _dislike_try(content_id, menu)
+            await _dislike_try(content_id, menu)
             return await eval(
                 f"self.msg.reply_{type_}(file_id, "
                 f"caption=str(content_id), reply_markup=menu, protect_content=True)"
