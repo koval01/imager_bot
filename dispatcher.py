@@ -12,10 +12,10 @@ from utils.analytics import AnalyticsMiddleware
 from utils.response_wait import ResponseWaitMiddleware
 
 # env init
-_is_debug_run = True if "debug_run" in sys.argv else False
+is_debug_run = True if "debug_run" in sys.argv else False
 
 # Configure logging
-_logging_mode = logging.DEBUG if _is_debug_run else logging.INFO
+_logging_mode = logging.DEBUG if is_debug_run else logging.INFO
 logging.basicConfig(level=_logging_mode)
 
 # prerequisites

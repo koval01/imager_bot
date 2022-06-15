@@ -145,12 +145,16 @@ async def invalid_select_get_mode(msg: types.Message):
                     reply_markup=await build_menu("rand_or_last"))
 
 
-@dp.message_handler(lambda message: message.text == dict_menu["next_content"][1], state=ViewContent.view_mode)
+@dp.message_handler(
+    lambda message: message.text in [
+        dict_menu["next_content"][1], dict_menu["next_content"][2]],
+    state=ViewContent.view_mode)
 @rate_limit(0.5, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
+        real_text = msg.text
         msg.text = data["select"]
-        await Selector(msg, data["order_mode"]).reply_selector()
+        await Selector(msg, data["order_mode"], real_text).reply_selector()
         donate_ = await donate_answer(random=True)
         await msg.answer(**donate_[0]) if donate_[1] else None
 

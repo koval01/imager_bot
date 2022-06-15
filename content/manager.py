@@ -26,12 +26,15 @@ class Manager:
     @property
     @timer
     def _get_user(self) -> User or None:
-        data = self.session.query(User).options(
-            FromCache("get_user", expiration_time=300)
-        ).filter_by(
-            user_id=self.user_id).one()
-        self.session.close()
-        return data
+        try:
+            data = self.session.query(User).options(
+                FromCache("get_user", expiration_time=300)
+            ).filter_by(
+                user_id=self.user_id).one()
+            self.session.close()
+            return data
+        except Exception as e:
+            log.warning("Error search user in database. Details: %s" % e)
 
     @property
     @async_timer
@@ -61,7 +64,7 @@ class Manager:
     async def check_user(self) -> bool:
         user = self._get_user
         if not user:
-            return True if await self._add_user else False
+            return True if await self._add_user() else False
         elif (user.tg_name_user != self.message.from_user.full_name) \
                 or (user.tg_username_user != self.message.from_user.username and (
                 self.message.from_user.username)):
@@ -88,7 +91,6 @@ class Manager:
             log.warning("Error update user. Details: %s" % e)
             return False
 
-    @property
     @async_timer
     async def _add_user(self) -> bool:
         try:
@@ -241,6 +243,22 @@ class Manager:
             return True
         except Exception as e:
             log.error("Error update last id content for user. Details: %s" % e)
+            return False
+
+    @async_timer
+    async def add_dislike(self, content_id: int) -> bool:
+        try:
+            self.session.query(Content).filter_by(
+                id=content_id
+            ).update(
+                {Content.dislikes: Content.dislikes + 1}
+            )
+            self.session.commit()
+            self.session.close()
+            return True
+        except Exception as e:
+            log.error("Error add dislike for content id: %d. Details: %s" %
+                      (content_id, e))
             return False
 
     @property
