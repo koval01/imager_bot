@@ -15,12 +15,14 @@ import logging as log
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
+@dp.async_task
 @rate_limit(60, 'group_init')
 async def group_handler(msg: types.Message):
     await msg.reply(dict_reply["group_answer"])
 
 
 @dp.message_handler(is_full_banned=True)
+@dp.async_task
 @rate_limit(60, 'full_banned_user')
 async def full_banned_user(msg: types.Message):
     await msg.reply(dict_reply["full_ban"])
@@ -84,6 +86,7 @@ async def get_donate_link(msg: types.Message):
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][1], is_banned=True)
+@dp.async_task
 @rate_limit(2, 'banned_user_init_load_content')
 async def banned_user_init_load_content(msg: types.Message):
     await msg.reply(dict_reply["banned_user"])
@@ -99,6 +102,7 @@ async def init_load_content(msg: types.Message):
 @dp.message_handler(content_types=[
     ContentType.PHOTO, ContentType.VIDEO, ContentType.VIDEO_NOTE, ContentType.VOICE
 ], state=TakeContent.wait_content, is_banned=True)
+@dp.async_task
 @rate_limit(2, 'banned_user_try_load_content')
 async def wait_content_user_banned(msg: types.Message):
     await msg.reply(dict_reply["banned_user"])
