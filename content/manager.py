@@ -214,7 +214,7 @@ class Manager:
         content = await self._get_content_query
         await logger.debug("Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
-            _selector = await self._get_last_id()
+            _selector = await self._get_last_id
             try:
                 content[_selector]
             except IndexError:
@@ -232,9 +232,10 @@ class Manager:
                 if len(content) else ""
             )
 
+    @property
     @async_timer
     async def _get_last_id(self) -> int:
-        x = await self._get_user
+        x = await self._get_user()
         return eval(f"int(x.last_{self.type_content})")
 
     @property
