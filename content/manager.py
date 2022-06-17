@@ -56,7 +56,7 @@ class Manager:
     @property
     async def check_ban(self) -> bool:
         if await self.check_user():
-            user = await self._get_user
+            user = await self._get_user()
             return True if user.banned else False
         return False
 
