@@ -85,7 +85,7 @@ class LoaderContent:
         try:
             async with self.session.begin() as session:
                 session.add(Content(
-                    type_content=self._content_type,
+                    type_content=await self._content_type,
                     loader_id=self.message.from_user.id,
                     file_id=await self._get_file_id,
                     moderated=await self._this_is_moderator

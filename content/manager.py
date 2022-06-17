@@ -90,7 +90,7 @@ class Manager:
                     values(
                         tg_name_user=self.message.from_user.full_name,
                         tg_username_user=username if username else "N/A"
-                ).returning(User.id)
+                )
                 await logger.debug("Update name for user. Request: %s" % q)
                 await session.commit()
                 await session.close()
@@ -248,7 +248,7 @@ class Manager:
                     values(**eval(
                         "{'last_%s': User.last_%s + 1}" %
                         (self.type_content, self.type_content)
-                    )).returning(User.id)
+                    ))
                 await logger.debug("Update last id. Request: %s" % q)
                 await session.commit()
                 await session.close()
@@ -263,8 +263,7 @@ class Manager:
             async with self.session.begin() as session:
                 q = update(Content). \
                     where(Content.id == content_id). \
-                    values(dislikes=Content.dislikes + 1).\
-                    returning(Content.id)
+                    values(dislikes=Content.dislikes + 1)
                 await logger.debug("Add dislike for content. Request: %s" % q)
                 await session.commit()
                 await session.close()
