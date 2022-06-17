@@ -44,7 +44,7 @@ class LoaderContent:
 
     @property
     async def _allow_load(self) -> bool:
-        return True if (self._content_type and (
+        return True if (await self._content_type and (
                 await self._check_content_on_moderation <= 100)
         ) else False
 
