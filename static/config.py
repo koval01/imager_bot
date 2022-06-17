@@ -11,6 +11,7 @@ ALT_APP_DOMAIN = getenv("ALT_APP_DOMAIN")
 DATABASE_URL = getenv("DATABASE_URL").replace("postgres://", "postgresql://")
 
 DONATE_LINK = getenv("DONATE_LINK")
+MANAGER_ID = getenv("MANAGER_ID")
 
 REDIS_URL = re.search(pattern_redis, getenv("REDIS_URL")).groupdict()
 REDIS_STORAGE = bool(getenv("REDIS_STORAGE"))

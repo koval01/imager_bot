@@ -1,5 +1,5 @@
-from static.menu import dictionary as menu_dict
-from static.menu import donate_inline_button
+from static.menu import donate_inline_button, dictionary as menu_dict
+from static.config import MANAGER_ID
 from random import uniform as float_rand
 
 dictionary = {
@@ -16,7 +16,8 @@ dictionary = {
     "no_content": "Нет никакого контента в этой категории, извини. Возможно ты уже всё просмотрел.",
     "internal_error": "Ошибка...\nКласс: <code>%s</code>",
     "banned_user": "Забанен! Иди на хуй",
-    "full_ban": "К сожалению для тебя этот бот недоступен.",
+    "full_ban": "К сожалению для тебя этот бот недоступен.\nВозможно, тебе ограничил доступ технический "
+                "администратор, обратись к %s, если считаешь это ошибкой." % MANAGER_ID,
     "group_answer": "Извини, этот бот не обслуживает группы.",
     "throttling_message": "Слишком много запросов.",
     "throttling_use_again": "Блокировка снята.",
