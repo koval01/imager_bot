@@ -28,17 +28,15 @@ class Selector:
 
     async def reply_selector(self) -> Message:
         async def _dislike_try(content_id_: int, menu_: ReplyKeyboardMarkup) -> Message:
+            reply_ = lambda x: dict(text=dict_reply[x], reply_markup=menu_)
             dislike_process = await Manager().add_dislike(content_id_) \
                 if menu_dict["next_content"][2] == self.real_text else "skip"
             if not dislike_process:
-                return await self.msg.reply(
-                    dict_reply["dislike_sent_error"], reply_markup=menu_)
+                return await self.msg.reply(**reply_("dislike_sent_error"))
             elif dislike_process != "skip":
                 if DISLIKE_DISABLED:
-                    return await self.msg.reply(
-                        dict_reply["error_action"], reply_markup=menu_)
-                return await self.msg.reply(
-                    dict_reply["dislike_sent"], reply_markup=menu_)
+                    return await self.msg.reply(**reply_("error_action"))
+                return await self.msg.reply(**reply_("dislike_sent"))
 
         try:
             type_ = await self.select_type
