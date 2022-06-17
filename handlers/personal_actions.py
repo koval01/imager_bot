@@ -149,7 +149,7 @@ async def invalid_select_get_mode(msg: types.Message):
     lambda message: message.text in [
         dict_menu["next_content"][1], dict_menu["next_content"][2]],
     state=ViewContent.view_mode)
-@rate_limit(0.8, 'next_content')
+@rate_limit(1, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         real_text = msg.text
