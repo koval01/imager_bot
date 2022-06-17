@@ -223,7 +223,7 @@ class Manager:
             await logger.debug("Get content: last_id = %d" % _selector)
         else:
             _selector = await _random_select(content, samples=50)
-            content_list = content
+            content_list = content[:]
             await logger.debug("Get content: rand = %d" % _selector)
         return None if not await self._update_last_id_content \
             else \
