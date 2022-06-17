@@ -1,13 +1,11 @@
-import logging as log
-
 from static.config import GA_ID, GA_SECRET
 from aiogram.types import Message
-from aiogram import Dispatcher
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler import current_handler
 from aiohttp import ClientSession
 from content.manager import Manager
 from utils.decorators import async_timer
+from utils.log_module import logger
 
 
 class Analytics:
@@ -29,15 +27,17 @@ class Analytics:
                         f"https://{self.host}/{self.path}", json=json, params=params
                 ) as response:
                     if response.status >= 200 < 300:
-                        log.debug("OK code Google Analytics")
+                        await logger.debug("OK code Google Analytics")
                     else:
-                        log.warning(f"Error code Google Analytics: {response.status}. "
-                                    f"Detail response: {response.text[:512]}")
+                        await logger.warning(
+                            f"Error code Google Analytics: {response.status}. "
+                            f"Detail response: {response.text[:512]}")
             except Exception as e:
-                log.error("Error send request to Google Analytics. Details: %s" % e)
+                await logger.error(
+                    "Error send request to Google Analytics. Details: %s" % e)
 
     @property
-    def _build_payload(self) -> dict:
+    async def _build_payload(self) -> dict:
         user_id = self.message.from_user.id
         return {
             'client_id': str(user_id),
@@ -56,7 +56,7 @@ class Analytics:
     async def send(self) -> _request_ga_server:
         return await self._request_ga_server({
             "measurement_id": self.id, "api_secret": self.secret
-        }, self._build_payload)
+        }, await self._build_payload)
 
     def __str__(self) -> str:
         return self.id
@@ -69,14 +69,16 @@ class AnalyticsMiddleware(BaseMiddleware):
     @staticmethod
     async def _update_user(message: Message) -> None:
         user_check = await Manager(message=message).check_user()
-        log.debug("Error check user. (Google Analytics middleware)") if not user_check else None
+        await logger.debug(
+            "Error check user. (Google Analytics middleware)") \
+            if not user_check else None
 
     async def on_process_message(self, message: Message, data: dict):
         handler = current_handler.get()
-        dispatcher = Dispatcher.get_current()
-        log.debug(
-            "Analytics middleware (debug data): %s" %
-            [handler.__name__, dispatcher, message, data]
-        )
+        # dispatcher = Dispatcher.get_current()
+        # await logger.debug(
+        #     "Analytics middleware (debug data): %s" %
+        #     [handler.__name__, dispatcher, message, data]
+        # )
         await self._update_user(message)
         await Analytics(message=message, alt_action=handler.__name__).send

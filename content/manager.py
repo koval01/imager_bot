@@ -2,13 +2,14 @@ import copy
 
 from typing import List, Dict, Any
 
-from database.controller import session_factory
+from database.controller import async_sql_session, engine as sql_engine
+from sqlalchemy.future import select
+from sqlalchemy import update
 from database.models import Content, User
 from aiogram.types import Message
-from database.caching_query import FromCache
-from utils.decorators import timer, async_timer
+from utils.decorators import async_timer
 from static.messages import dictionary as msg_dict
-import logging as log
+from utils.log_module import logger
 import numpy as np
 
 
@@ -17,125 +18,135 @@ class Manager:
             self, type_content: str = "photo", message: Message = None,
             get_content_random: bool = False
     ) -> None:
-        self.session = session_factory()
         self.type_content = type_content
         self.message = message
         self.user_id = message.from_user.id if message else None
         self.get_content_random = get_content_random
+        self.session = async_sql_session
 
-    @property
-    @timer
-    def _get_user(self) -> User or None:
+    @async_timer
+    async def _get_user(self) -> User or None:
         try:
-            data = self.session.query(User).options(
-                FromCache("get_user", expiration_time=120)
-            ).filter_by(
-                user_id=self.user_id).one()
-            self.session.close()
+            async with self.session.begin() as session:
+                q = select(User).where(User.user_id == self.user_id)
+                result = await session.execute(q)
+                curr = result.scalars()
+                data = curr.one()
+                await session.close()
             return data
         except Exception as e:
-            log.warning("Error search user in database. Details: %s" % e)
+            await logger.warning("Error search user in database. Details: %s" % e)
 
     @property
     @async_timer
     async def _get_all_users(self) -> List[User] or None:
-        data = self.session.query(User).options(
-            FromCache("get_all_users", expiration_time=180)).all()
-        self.session.close()
+        async with self.session.begin() as session:
+            q = select(User).order_by(User.id)
+            result = await session.execute(q)
+            curr = result.scalars()
+            data = curr.all()
+            await session.close()
         return data
 
     @property
+    @async_timer
     async def get_all_users_ids(self) -> List[int] or None:
         return [user.user_id for user in await self._get_all_users]
 
     @property
     async def check_ban(self) -> bool:
         if await self.check_user():
-            return True if self._get_user.banned else False
+            user = await self._get_user
+            return True if user.banned else False
         return False
 
     @property
     async def check_full_ban(self) -> bool:
         if await self.check_user():
-            return True if self._get_user.full_banned else False
+            user = await self._get_user()
+            return True if user.full_banned else False
         return False
 
     @async_timer
     async def check_user(self) -> bool:
-        user = self._get_user
+        user = await self._get_user()
         if not user:
-            return True if await self._add_user() else False
+            return True if \
+                await self._add_user() else False
         elif (user.tg_name_user != self.message.from_user.full_name) \
                 or (user.tg_username_user != self.message.from_user.username and (
                 self.message.from_user.username)):
-            _ = self._update_user_name
+            _ = await self._update_user_name
         return True
 
     @property
-    @timer
-    def _update_user_name(self) -> bool:
+    @async_timer
+    async def _update_user_name(self) -> bool:
         try:
-            username = self.message.from_user.username
-            self.session.query(User).filter_by(
-                user_id=self.user_id
-            ).update(
-                {
-                    User.tg_name_user: self.message.from_user.full_name,
-                    User.tg_username_user: username if username else "N/A"
-                }
-            )
-            self.session.commit()
-            self.session.close()
+            async with self.session.begin() as session:
+                username = self.message.from_user.username
+                q = update(User). \
+                    where(User.id == self.user_id). \
+                    values(
+                        tg_name_user=self.message.from_user.full_name,
+                        tg_username_user=username if username else "N/A"
+                ).returning(User.id)
+                await logger.debug("Update name for user. Request: %s" % q)
+                await session.commit()
+                await session.close()
             return True
         except Exception as e:
-            log.warning("Error update user. Details: %s" % e)
+            await logger.warning("Error update user. Details: %s" % e)
             return False
 
     @async_timer
     async def _add_user(self) -> bool:
         try:
-            self.session.add(User(
-                user_id=self.user_id,
-                tg_name_user=self.message.from_user.full_name,
-                tg_username_user=self.message.from_user.username,
-                banned=False,
-                full_banned=False,
-                last_photo=0,
-                last_video=0,
-                last_voice=0
-            ))
-            self.session.commit()
-            self.session.close()
+            async with self.session.begin() as session:
+                session.add(User(
+                    user_id=self.user_id,
+                    tg_name_user=self.message.from_user.full_name,
+                    tg_username_user=self.message.from_user.username,
+                    banned=False,
+                    full_banned=False,
+                    last_photo=0,
+                    last_video=0,
+                    last_voice=0
+                ))
+                await session.commit()
+                await session.close()
             return True
         except Exception as e:
-            log.error("Error add user. Details: %s" % e)
+            await logger.warning("Error add user. Details: %s" % e)
             return False
 
     @property
-    @timer
-    def _get_content_query(self) -> Content:
-        data = self.session.query(Content).options(
-            FromCache("get_content_query", expiration_time=600)
-        ).filter_by(
-            moderated=True, type_content=self.type_content)
-        self.session.close()
-        return data
-
-    @timer
-    def _get_all_content(self, moderated: bool = True) -> Content:
-        data = self.session.query(Content).options(
-            FromCache("get_all_content", expiration_time=600)
-        ).filter_by(moderated=moderated)
-        self.session.close()
-        return data
-
-    @staticmethod
     @async_timer
-    async def _sort_content(content: Content) -> List[Content]:
-        return sorted(
-            [el for el in copy.deepcopy(content.all())],
-            key=lambda x: x.id, reverse=False
-        )
+    async def _get_content_query(self) -> Content:
+        async with self.session.begin() as session:
+            moderated_ = True
+            q = select(Content).\
+                where(
+                Content.moderated == moderated_,
+                Content.type_content == self.type_content
+            )
+            result = await session.execute(q)
+            curr = result.scalars()
+            data = curr.all()
+            await session.close()
+        return data
+
+    @async_timer
+    async def _get_all_content(self, moderated: bool = True) -> Content:
+        async with self.session.begin() as session:
+            q = select(Content).\
+                order_by(Content.id).\
+                where(Content.moderated == moderated)
+            result = await session.execute(q)
+            curr = result.scalars()
+            data = curr.all()
+            await session.close()
+        return data
 
     @staticmethod
     @async_timer
@@ -187,81 +198,82 @@ class Manager:
     async def get_top(self) -> str:
         return "%s\n(%s)" % ("\n".join([
             line["message"] for line in await self._build_top_list(
-                self._get_all_content(moderated=True), await self._get_all_users)
+                await self._get_all_content(moderated=True),
+                await self._get_all_users)
         ]), msg_dict["top_list_comment"])
 
     @property
     async def _get_content(self) -> tuple or None:
 
-        @timer
-        def _random_select(content_data: list, samples: int = 10) -> int:
+        @async_timer
+        async def _random_select(content_data: list, samples: int = 10) -> int:
             _array = np.random.choice(len(content_data[:]), samples, replace=True)
             np.random.shuffle(_array)
             return _array[0]
 
-        content = self._get_content_query
-        log.debug("Random get content = %s" % self.get_content_random)
+        content = await self._get_content_query
+        await logger.debug("Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
-            _content_sorted = await self._sort_content(content)
-            _selector = self._get_last_id
+            _selector = await self._get_last_id
             try:
                 content[_selector]
             except IndexError:
                 return
-            content_list = _content_sorted
-            log.debug("Get content: last_id = %d" % _selector)
+            content_list = content[:]
+            await logger.debug("Get content: last_id = %d" % _selector)
         else:
-            _selector = _random_select(content, samples=50)
+            _selector = await _random_select(content, samples=50)
             content_list = content
-            log.debug("Get content: rand = %d" % _selector)
-        return None if not self._update_last_id_content \
+            await logger.debug("Get content: rand = %d" % _selector)
+        return None if not await self._update_last_id_content \
             else \
             (
                 (content_list[_selector].id, content_list[_selector].file_id)
-                if content.count() else ""
+                if len(content) else ""
             )
 
     @property
-    @timer
-    def _get_last_id(self) -> int:
-        x = self.session.query(User).filter_by(
-            user_id=self.user_id).all()
-        self.session.close()
-        return eval(f"int(x[0].last_{self.type_content})")
+    @async_timer
+    async def _get_last_id(self) -> int:
+        x = await self._get_user
+        return eval(f"int(x.last_{self.type_content})")
 
     @property
-    @timer
-    def _update_last_id_content(self) -> bool:
+    @async_timer
+    async def _update_last_id_content(self) -> bool:
         try:
-            self.session.query(User).filter_by(
-                user_id=self.user_id
-            ).update(
-                eval("{User.last_%s: User.last_%s + 1}" % (self.type_content, self.type_content))
-            )
-            self.session.commit()
-            self.session.close()
+            async with self.session.begin() as session:
+                q = update(User).\
+                    where(User.id == self.user_id).\
+                    values(**eval(
+                        "{'last_%s': User.last_%s + 1}" %
+                        (self.type_content, self.type_content)
+                    )).returning(User.id)
+                await logger.debug("Update last id. Request: %s" % q)
+                await session.commit()
+                await session.close()
             return True
         except Exception as e:
-            log.error("Error update last id content for user. Details: %s" % e)
+            await logger.error("Error update last id content for user. Details: %s" % e)
             return False
 
     @async_timer
     async def add_dislike(self, content_id: int) -> bool:
         try:
-            self.session.query(Content).filter_by(
-                id=content_id
-            ).update(
-                {Content.dislikes: Content.dislikes + 1}
-            )
-            self.session.commit()
-            self.session.close()
+            async with self.session.begin() as session:
+                q = update(Content). \
+                    where(Content.id == content_id). \
+                    values(dislikes=Content.dislikes + 1).\
+                    returning(Content.id)
+                await logger.debug("Add dislike for content. Request: %s" % q)
+                await session.commit()
+                await session.close()
             return True
         except Exception as e:
-            log.error("Error add dislike for content id: %d. Details: %s" %
-                      (content_id, e))
+            await logger.error("Error add dislike for content id: %d. Details: %s" %
+                               (content_id, e))
             return False
 
-    @property
     async def get_content(self) -> tuple:
         data = await self._get_content
         return data if data.__class__.__name__ == "tuple" else (None, None)

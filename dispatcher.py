@@ -1,5 +1,3 @@
-import logging
-import sys
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,13 +8,6 @@ from static import config
 from utils.throttling import ThrottlingMiddleware
 from utils.analytics import AnalyticsMiddleware
 from utils.response_wait import ResponseWaitMiddleware
-
-# env init
-is_debug_run = True if "debug_run" in sys.argv else False
-
-# Configure logging
-_logging_mode = logging.DEBUG if is_debug_run else logging.INFO
-logging.basicConfig(level=_logging_mode)
 
 # prerequisites
 if not config.BOT_TOKEN:

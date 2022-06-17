@@ -18,6 +18,9 @@ sentry-sdk = "*"
 numpy = "*"
 redis = "*"
 psutil = "*"
+aiologger = "*"
+asyncpg = "*"
+greenlet = "*"
 
 [dev-packages]
 

@@ -3,7 +3,7 @@ from static.messages import dictionary as dict_reply
 from aiogram.types import Message, ReplyKeyboardMarkup
 from content.manager import Manager
 from static.config import DISLIKE_DISABLED
-import logging as log
+from utils.log_module import logger
 
 
 class Selector:
@@ -43,8 +43,8 @@ class Selector:
             content_id, file_id = await Manager(
                 type_content=type_, message=self.msg,
                 get_content_random=await self._select_order_mode
-            ).get_content
-            log.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
+            ).get_content()
+            await logger.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
                 return await self.msg.reply(dict_reply["no_content"])
             menu = await build_menu("next_content")
@@ -54,5 +54,5 @@ class Selector:
                 f"caption=str(content_id), reply_markup=menu, protect_content=True)"
             )
         except Exception as e:
+            await logger.error("Error send content (selector). Details: %s" % e)
             return await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)
-            log.error("Error send content (selector). Details: %s" % e)

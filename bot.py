@@ -1,4 +1,6 @@
 from aiogram import executor
+from utils.log_module import logger
+from database.controller import engine as sql_engine
 from dispatcher import dp
 import handlers
 import sentry_sdk
@@ -13,6 +15,8 @@ sentry_sdk.init(
 async def shutdown_actions(dp) -> None:
     await dp.storage.close()
     await dp.storage.wait_closed()
+    await logger.shutdown()
+    await sql_engine.dispose()
 
 
 if __name__ == "__main__":

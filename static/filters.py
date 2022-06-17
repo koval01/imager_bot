@@ -28,7 +28,8 @@ class IsModeratorFilter(BoundFilter):
         self.is_moderator = is_moderator
 
     async def check(self, message: types.Message):
-        return CheckModerator(message).get or (message.from_user.id == config.BOT_OWNER)
+        return await CheckModerator(message).get or \
+               (message.from_user.id == config.BOT_OWNER)
 
 
 class IsBannedFilter(BoundFilter):

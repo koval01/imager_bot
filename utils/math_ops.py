@@ -3,7 +3,7 @@ import math
 
 class Math:
     @staticmethod
-    def convert_size_data(size_bytes: int) -> str:
+    async def convert_size_data(size_bytes: int) -> str:
         if size_bytes == 0:
             return "0 B"
         size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")

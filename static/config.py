@@ -8,7 +8,7 @@ BOT_OWNER = int(getenv("BOT_OWNER"))
 
 APP_DOMAIN = getenv("APP_DOMAIN")
 ALT_APP_DOMAIN = getenv("ALT_APP_DOMAIN")
-DATABASE_URL = getenv("DATABASE_URL").replace("postgres://", "postgresql://")
+DATABASE_URL = getenv("DATABASE_URL").replace("postgres://", "postgresql+asyncpg://")
 
 DONATE_LINK = getenv("DONATE_LINK")
 MANAGER_ID = getenv("MANAGER_ID")

@@ -2,7 +2,7 @@ from content.manager import Manager
 from aiogram import types, Bot
 from typing import Tuple
 from static.messages import dictionary as dict_reply
-import logging as log
+from utils.log_module import logger
 
 
 class NewsSend:
@@ -24,7 +24,7 @@ class NewsSend:
                     text, self.message.from_user.full_name), disable_web_page_preview=False)
                 successes += 1
             except Exception as e:
-                log.info("Error send message. Details: %s" % e)
+                await logger.info("Error send message. Details: %s" % e)
         return successes, ""
 
     async def execute(self) -> types.Message:

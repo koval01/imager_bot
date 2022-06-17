@@ -1,28 +1,41 @@
 from aiogram import types
-from database.controller import session_factory
+from database.controller import async_sql_session, engine as sql_engine
+from sqlalchemy.future import select
 from database.models import Moderator
 from typing import List
-from utils.decorators import timer
+from utils.decorators import async_timer
 
 
 class CheckModerator:
     def __init__(self, message: types.Message = None) -> None:
-        self.session = session_factory()
+        self.session = async_sql_session
         self.message = message
 
     @property
-    @timer
-    def _check_user(self) -> bool:
-        x = self.session.query(Moderator).filter_by(
-            tg_user_id=self.message.from_user.id)
-        return True if x.count() else False
+    @async_timer
+    async def _check_user(self) -> bool:
+        async with self.session.begin() as session:
+            q = select(Moderator).where(
+                Moderator.tg_user_id == self.message.from_user.id)
+            result = await session.execute(q)
+            curr = result.scalars()
+            data = curr.all()
+            await session.close()
+        return True if len(data) else False
 
     @property
-    @timer
-    def get_moderators(self) -> List[int] or None:
-        x = self.session.query(Moderator).all()
-        return [int(el.tg_user_id) for el in x] if len(x) else None
+    @async_timer
+    async def get_moderators(self) -> List[int] or None:
+        async with self.session.begin() as session:
+            q = select(Moderator).order_by(Moderator.tg_user_id)
+            result = await session.execute(q)
+            curr = result.scalars()
+            data = curr.all()
+            await session.close()
+        return [int(el.tg_user_id) for el in data] \
+            if len(data) else None
 
     @property
-    def get(self) -> bool:
-        return bool(self._check_user)
+    async def get(self) -> bool:
+        return bool(
+            await self._check_user)

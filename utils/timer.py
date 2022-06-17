@@ -1,7 +1,7 @@
 from typing import Callable
 from static.config import REDIS_URL
 from utils.system_data import SystemData
-import logging as log
+from utils.log_module import logger
 import numpy as np
 import redis
 import json
@@ -43,12 +43,12 @@ class Timer:
             )[self.redis_var_name]
         )
 
-    def _write_data(self, data: dict) -> bool:
+    async def _write_data(self, data: dict) -> bool:
         try:
             self.r.hset(self.redis_var_name, self.redis_var_name, json.dumps(data))
             return True
         except Exception as e:
-            log.error("Error write data to Redis in timer. Details: %s" % e)
+            await logger.error("Error write data to Redis in timer. Details: %s" % e)
             return False
 
     @property
@@ -58,11 +58,11 @@ class Timer:
         ]) else False
 
     @property
-    def _add_key(self) -> bool:
+    async def _add_key(self) -> bool:
         data = self._read_data
         data.update({self.name: [self.time]}) \
             if not self._check_key else None
-        return self._write_data(data)
+        return await self._write_data(data)
 
     def _check_len(self, name: str) -> bool:
         return True if len(self._read_data[name]) < self.max_key_len else False
@@ -72,18 +72,18 @@ class Timer:
         return [(key, len(data)) for key, data in self._read_data.items()]
 
     @property
-    def write_result(self) -> bool:
+    async def write_result(self) -> bool:
         if not self.name:
             return False
-        _ = self._add_key
+        _ = await self._add_key
         data = self._read_data
         if not self._check_len(self.name):
             data[self.name] = data[self.name][-abs(self.max_key_len):]
         data[self.name].append(self.time)
-        return self._write_data(data)
+        return await self._write_data(data)
 
-    def calc_avg(self, custom_handler: str = None) -> dict:
-        _ = self._add_key
+    async def calc_avg(self, custom_handler: str = None) -> dict:
+        _ = await self._add_key
         _name = self.name if not custom_handler else custom_handler
         _data = self._read_data[_name]
         _np_data = np.array(_data)
@@ -95,17 +95,16 @@ class Timer:
             }
         } if _data else 0
 
-    @property
-    def all_handlers(self) -> dict:
+    async def all_handlers(self) -> dict:
         _data = self._all_data
         return {key: {
             "time": self.calc_avg(key), "len": len_
         } for key, len_ in _data}
 
     @property
-    def build_response(self) -> str:
-        _data = self.all_handlers
-        _system_data = {"memory": SystemData().memory(), "cpu": SystemData().cpu()}
+    async def build_response(self) -> str:
+        _data = await self.all_handlers()
+        _system_data = {"memory": await SystemData().memory(), "cpu": await SystemData().cpu()}
         _template = "{%d} <i>%s</i>: " \
                     "<code>%.4f</code>/<code>%.4f</code>/<code>%.4f</code>/" \
                     "<code>%.4f</code>/<code>%.4f</code>"
