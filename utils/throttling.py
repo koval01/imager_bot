@@ -68,12 +68,12 @@ class ThrottlingMiddleware(BaseMiddleware):
         :param message:
         :param throttled:
         """
-        handler = current_handler.get()
-        dispatcher = Dispatcher.get_current()
-        if handler:
-            key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
-        else:
-            key = f"{self.prefix}_message"
+        # handler = current_handler.get()
+        # dispatcher = Dispatcher.get_current()
+        # if handler:
+        #     key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
+        # else:
+        #     key = f"{self.prefix}_message"
 
         # Calculate how many time is left till the block ends
         delta = throttled.rate - throttled.delta
@@ -86,8 +86,8 @@ class ThrottlingMiddleware(BaseMiddleware):
         await asyncio.sleep(delta)
 
         # Check lock status
-        thr = await dispatcher.check_key(key)
+        # thr = await dispatcher.check_key(key)
 
         # If current message is not last with current key - do not send message
-        if (thr.exceeded_count == throttled.exceeded_count) and (throttled.rate > 3):
-            await message.reply(reply_dict["throttling_use_again"])
+        # if (thr.exceeded_count == throttled.exceeded_count) and (throttled.rate > 3):
+        #     await message.reply(reply_dict["throttling_use_again"])
