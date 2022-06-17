@@ -13,7 +13,6 @@ class Selector:
         self.text_order_mode = text_order_mode
         self.real_text = real_text
 
-    @property
     async def select_type(self) -> str:
         return [
             ["photo", "video", "voice"][i]
@@ -21,7 +20,6 @@ class Selector:
             if x == self.user_text
         ][0]
 
-    @property
     async def _select_order_mode(self) -> bool or None:
         order_mode = lambda x: self.text_order_mode == menu_dict["rand_or_last"][x]
         return True if order_mode(0) else (False if order_mode(1) else None)
@@ -39,10 +37,10 @@ class Selector:
                 return await self.msg.reply(**reply_("dislike_sent"))
 
         try:
-            type_ = await self.select_type
+            type_ = await self.select_type()
             content_id, file_id = await Manager(
                 type_content=type_, message=self.msg,
-                get_content_random=await self._select_order_mode
+                get_content_random=await self._select_order_mode()
             ).get_content()
             await logger.info(f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
