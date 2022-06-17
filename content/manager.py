@@ -28,7 +28,7 @@ class Manager:
     def _get_user(self) -> User or None:
         try:
             data = self.session.query(User).options(
-                FromCache("get_user", expiration_time=300)
+                FromCache("get_user", expiration_time=120)
             ).filter_by(
                 user_id=self.user_id).one()
             self.session.close()
