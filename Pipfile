@@ -19,6 +19,7 @@ psutil = "*"
 aiologger = "*"
 asyncpg = "*"
 greenlet = "*"
+uvloop = "*"
 
 [dev-packages]
 
