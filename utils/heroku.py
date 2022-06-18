@@ -88,8 +88,9 @@ class Heroku:
             }
 
         data = await self._request("builds")
-        return _get_body(data[0]) \
-            if _check_build(data[0]) else {}
+        if len(data):
+            return _get_body(data[0]) \
+                if _check_build(data[0]) else {}
 
     async def send_build_for_moderators(self) -> None:
         get_moderators = await CheckModerator().get_moderators
