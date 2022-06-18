@@ -88,7 +88,7 @@ class Heroku:
             }
 
         data = await self._request("builds")
-        await logger.inf("Data: %s, %s" % (str(data), type(data)))
+        await logger.info("Data: %s, %s" % (str(data), type(data)))
         try:
             data[0]
         except Exception as e:
