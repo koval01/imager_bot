@@ -61,7 +61,15 @@ dictionary = {
     "timings_title_template":
         "{len} <i>function</i>: "
         "<code>min</code>/<code>avg</code>/<code>max</code>/"
-        "<code>50%</code>/<code>95%</code>"
+        "<code>50%</code>/<code>95%</code>",
+    "build_current": "Сейчас активна сборка",
+    "build_updated": "Собрана новая версия",
+    "build_data_template": "%s\n"
+                           "\nID: <code>%s</code>"
+                           "\nВремя инициализации: <i>%s</i>"
+                           "\nВремя публикации: <i>%s</i>"
+                           "\nОписание: (%s)"
+                           "\nЖурнал сборки: <b><a href=\"%s\">Посмотреть</a></b>"
 }
 
 async def donate_answer(random: bool = False) -> (dict, bool):

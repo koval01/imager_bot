@@ -13,9 +13,13 @@ DATABASE_URL = getenv("DATABASE_URL").replace("postgres://", "postgresql+asyncpg
 DONATE_LINK = getenv("DONATE_LINK")
 MANAGER_ID = getenv("MANAGER_ID")
 
-REDIS_URL = re.search(pattern_redis, getenv("REDIS_URL")).groupdict()
+REDIS_URL_ORG = getenv("REDIS_URL")
+REDIS_URL = re.search(pattern_redis, REDIS_URL_ORG).groupdict()
 REDIS_STORAGE = bool(getenv("REDIS_STORAGE"))
 DISLIKE_DISABLED = bool(getenv("DISLIKE_DISABLED"))
 
 GA_ID = getenv("GA_ID")
 GA_SECRET = getenv("GA_SECRET")
+
+HEROKU_API_KEY = getenv("HEROKU_API_KEY")
+HEROKU_APP_NAME = APP_DOMAIN.replace(".herokuapp.com", "")
