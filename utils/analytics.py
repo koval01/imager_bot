@@ -1,9 +1,10 @@
-from static.config import GA_ID, GA_SECRET
-from aiogram.types import Message
-from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler import current_handler
+from aiogram.dispatcher.middlewares import BaseMiddleware
+from aiogram.types import Message
 from aiohttp import ClientSession
+
 from content.manager import Manager
+from static.config import GA_ID, GA_SECRET
 from utils.decorators import async_timer
 from utils.log_module import logger
 

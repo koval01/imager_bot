@@ -1,9 +1,9 @@
+import logging
+import sys
+from logging import INFO, DEBUG
+
 from aiologger import Logger
 from aiologger.formatters.base import Formatter
-from logging import INFO, DEBUG
-import logging
-
-import sys
 
 is_debug_run = True if "debug_run" in sys.argv else False
 log_format = "%(name)s - %(levelname)s - %(message)s"

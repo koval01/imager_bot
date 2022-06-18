@@ -1,16 +1,15 @@
-import copy
-
 from typing import List, Dict, Any
 
-from database.controller import async_sql_session, engine as sql_engine
-from sqlalchemy.future import select
-from sqlalchemy import update
-from database.models import Content, User
-from aiogram.types import Message
-from utils.decorators import async_timer
-from static.messages import dictionary as msg_dict
-from utils.log_module import logger
 import numpy as np
+from aiogram.types import Message
+from sqlalchemy import update
+from sqlalchemy.future import select
+
+from database.controller import async_sql_session
+from database.models import Content, User
+from static.messages import dictionary as msg_dict
+from utils.decorators import async_timer
+from utils.log_module import logger
 
 
 class Manager:
@@ -35,7 +34,8 @@ class Manager:
                 await session.close()
             return data
         except Exception as e:
-            await logger.warning("Error search user in database. Details: %s" % e)
+            await logger.warning(
+                "Error search user in database. Details: %s" % e)
 
     @property
     @async_timer
@@ -74,8 +74,10 @@ class Manager:
             return True if \
                 await self._add_user() else False
         elif (user.tg_name_user != self.message.from_user.full_name) \
-                or (user.tg_username_user != self.message.from_user.username and (
-                self.message.from_user.username)):
+                or (
+                user.tg_username_user != self.message.from_user.username
+                and (
+                        self.message.from_user.username)):
             _ = await self._update_user_name
         return True
 
@@ -88,8 +90,8 @@ class Manager:
                 q = update(User). \
                     where(User.id == self.user_id). \
                     values(
-                        tg_name_user=self.message.from_user.full_name,
-                        tg_username_user=username if username else "N/A"
+                    tg_name_user=self.message.from_user.full_name,
+                    tg_username_user=username if username else "N/A"
                 )
                 await logger.debug("Update name for user. Request: %s" % q)
                 await session.commit()
@@ -125,7 +127,7 @@ class Manager:
     async def _get_content_query(self) -> Content:
         async with self.session.begin() as session:
             moderated_ = True
-            q = select(Content).\
+            q = select(Content). \
                 where(
                 Content.moderated == moderated_,
                 Content.type_content == self.type_content
@@ -139,8 +141,8 @@ class Manager:
     @async_timer
     async def _get_all_content(self, moderated: bool = True) -> Content:
         async with self.session.begin() as session:
-            q = select(Content).\
-                order_by(Content.id).\
+            q = select(Content). \
+                order_by(Content.id). \
                 where(Content.moderated == moderated)
             result = await session.execute(q)
             curr = result.scalars()
@@ -179,13 +181,17 @@ class Manager:
             ][0]
 
         _template = msg_dict["top_list_template"]
-        _users = await _sort_users_by_len_top(await _sort_by_ids_top_list())
+        _users = \
+            await _sort_users_by_len_top(
+                await _sort_by_ids_top_list())
         _users_array = users[:]
 
         return [
             {
                 "message": _template % (
-                    i + 1, await _get_user_name_top(_users[i][0], _users_array), _users[i][1]),
+                    i + 1, await _get_user_name_top(
+                        _users[i][0], _users_array),
+                    _users[i][1]),
                 "data": {
                     "index": i,
                     "user": _users[i]
@@ -197,7 +203,8 @@ class Manager:
     @property
     async def get_top(self) -> str:
         return "%s\n(%s)" % ("\n".join([
-            line["message"] for line in await self._build_top_list(
+            line["message"] for line in
+            await self._build_top_list(
                 await self._get_all_content(moderated=True),
                 await self._get_all_users)
         ]), msg_dict["top_list_comment"])
@@ -207,14 +214,18 @@ class Manager:
 
         @async_timer
         async def _random_select(content_data: list, samples: int = 10) -> int:
-            _array = np.random.choice(len(content_data[:]), samples, replace=True)
+            _array = np.random.choice(
+                len(content_data[:]), samples, replace=True)
             np.random.shuffle(_array)
             return _array[0]
 
         content = await self._get_content_query
-        await logger.debug("Random get content = %s" % self.get_content_random)
+        await logger.debug(
+            "Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
             _selector = await self._get_last_id
+            await logger.debug("Selector for %d is %d" % (
+                self.user_id, _selector))
             try:
                 content[_selector]
             except IndexError:
@@ -228,7 +239,9 @@ class Manager:
         return None if not await self._update_last_id_content \
             else \
             (
-                (content_list[_selector].id, content_list[_selector].file_id)
+                (
+                    content_list[_selector].id,
+                    content_list[_selector].file_id)
                 if len(content) else ""
             )
 
@@ -236,7 +249,9 @@ class Manager:
     @async_timer
     async def _get_last_id(self) -> int:
         x = await self._get_user()
-        return eval(f"int(x.last_{self.type_content})")
+        return eval(
+            f"int(x.last_{self.type_content})",
+            {"x": x})
 
     @property
     @async_timer
@@ -244,33 +259,38 @@ class Manager:
         try:
             async with self.session.begin() as session:
                 q = update(User).\
-                    where(User.id == self.user_id).\
-                    values(**eval(
-                        "{'last_%s': User.last_%s + 1}" %
-                        (self.type_content, self.type_content)
-                    ))
-                await logger.debug("Update last id. Request: %s" % q)
+                    values(eval(
+                        "{User.last_%s: User.last_%s + 1}" %
+                        tuple([self.type_content]*2)
+                    )).\
+                    where(User.user_id == self.user_id)
+                await session.execute(q)
                 await session.commit()
                 await session.close()
+                await logger.debug("Update last id. Request: %s" % q)
             return True
         except Exception as e:
-            await logger.error("Error update last id content for user. Details: %s" % e)
+            await logger.error(
+                "Error update last id content for user. Details: %s" % e)
             return False
 
     @async_timer
     async def add_dislike(self, content_id: int) -> bool:
         try:
             async with self.session.begin() as session:
-                q = update(Content). \
-                    where(Content.id == content_id). \
-                    values(dislikes=Content.dislikes + 1)
-                await logger.debug("Add dislike for content. Request: %s" % q)
+                q = update(Content).\
+                    where(Content.id == content_id).\
+                    values({Content.dislikes: Content.dislikes + 1})
+                await session.execute(q)
                 await session.commit()
                 await session.close()
+                await logger.debug(
+                    "Add dislike for content. Request: %s" % q)
             return True
         except Exception as e:
-            await logger.error("Error add dislike for content id: %d. Details: %s" %
-                               (content_id, e))
+            await logger.error(
+                "Error add dislike for content id: %d. Details: %s" %
+                (content_id, e))
             return False
 
     async def get_content(self) -> tuple:

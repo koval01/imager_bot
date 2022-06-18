@@ -1,8 +1,8 @@
-from utils.timer import Timer
-from utils.log_module import logger
-
 import asyncio
 import time
+
+from utils.log_module import logger
+from utils.timer import Timer
 
 
 # def timer(func):

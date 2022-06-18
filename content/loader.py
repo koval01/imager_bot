@@ -1,12 +1,13 @@
 from aiogram import types
-from database.controller import async_sql_session, engine as sql_engine
 from sqlalchemy.future import select
+
+from database.controller import async_sql_session
 from database.models import Content
 from static import config
-from utils.moderator import CheckModerator
 from static.messages import dictionary as dict_reply
 from utils.decorators import async_timer
 from utils.log_module import logger
+from utils.moderator import CheckModerator
 
 
 class LoaderContent:
@@ -19,13 +20,14 @@ class LoaderContent:
         try:
             _type = self.message.content_type
             return "video" if _type == "video_note" else \
-            [
-                t for t in ["photo", "video", "voice"]
-                if t == _type
-            ][0]
+                [
+                    t for t in ["photo", "video", "voice"]
+                    if t == _type
+                ][0]
         except Exception as e:
-            await logger.warning("Error resolve content type (%s). Details: %s" % (
-                self._content_type.__name__, e))
+            await logger.warning(
+                "Error resolve content type (%s). Details: %s" % (
+                    self._content_type.__name__, e))
             return ""
 
     @property
@@ -46,7 +48,7 @@ class LoaderContent:
     async def _allow_load(self) -> bool:
         return True if (await self._content_type and (
                 await self._check_content_on_moderation <= 100)
-        ) else False
+                        ) else False
 
     @property
     async def _this_is_moderator(self) -> bool:
@@ -59,8 +61,9 @@ class LoaderContent:
             if self.message.video_note:
                 return "video_note"
         except Exception as e:
-            await logger.error("Error check content type (%s). Details: %s" % (
-                self._video_note_check.__name__, e))
+            await logger.error(
+                "Error check content type (%s). Details: %s" % (
+                    self._video_note_check.__name__, e))
         return current_type
 
     @property

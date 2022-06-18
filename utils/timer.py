@@ -1,10 +1,13 @@
+import json
 from typing import Callable
-from static.config import REDIS_URL
-from utils.system_data import SystemData
-from utils.log_module import logger
+
 import numpy as np
 import redis
-import json
+
+from static.config import REDIS_URL
+from static.messages import dictionary as reply_dict
+from utils.log_module import logger
+from utils.system_data import SystemData
 
 
 class Timer:
@@ -19,16 +22,18 @@ class Timer:
         self.time = round(time, 4)
         self.max_key_len = 1000
 
-    def _decode_redis(self, src):
+    async def _decode_redis(self, src):
         if isinstance(src, list):
             rv = list()
             for key in src:
-                rv.append(self._decode_redis(key))
+                _key = await self._decode_redis(key)
+                rv.append(_key)
             return rv
         elif isinstance(src, dict):
             rv = dict()
             for key in src:
-                rv[key.decode()] = self._decode_redis(src[key])
+                _key = await self._decode_redis(src[key])
+                rv[key.decode()] = _key
             return rv
         elif isinstance(src, bytes):
             return src.decode()
@@ -36,11 +41,12 @@ class Timer:
             raise Exception("type not handled: " + type(src))
 
     @property
-    def _read_data(self) -> dict:
+    async def _read_data(self) -> dict:
+        _decoded = await self._decode_redis(
+            self.r.hgetall(self.redis_var_name)
+        )
         return json.loads(
-            self._decode_redis(
-                self.r.hgetall(self.redis_var_name)
-            )[self.redis_var_name]
+            _decoded[self.redis_var_name]
         )
 
     async def _write_data(self, data: dict) -> bool:
@@ -52,32 +58,37 @@ class Timer:
             return False
 
     @property
-    def _check_key(self) -> bool:
+    async def _check_key(self) -> bool:
+        data = await self._read_data
         return True if len([
-            key for key, data in self._read_data.items() if key == self.name
+            key for key, data in data.items() if key == self.name
         ]) else False
 
     @property
     async def _add_key(self) -> bool:
-        data = self._read_data
+        data = await self._read_data
         data.update({self.name: [self.time]}) \
-            if not self._check_key else None
+            if not await self._check_key else None
         return await self._write_data(data)
 
-    def _check_len(self, name: str) -> bool:
-        return True if len(self._read_data[name]) < self.max_key_len else False
+    async def _check_len(self, name: str) -> bool:
+        data = await self._read_data
+        return True \
+            if len(data[name]) <= self.max_key_len \
+            else False
 
     @property
-    def _all_data(self) -> list:
-        return [(key, len(data)) for key, data in self._read_data.items()]
+    async def _all_data(self) -> list:
+        data = await self._read_data
+        return [(key, len(data)) for key, data in data.items()]
 
     @property
     async def write_result(self) -> bool:
         if not self.name:
             return False
         _ = await self._add_key
-        data = self._read_data
-        if not self._check_len(self.name):
+        data = await self._read_data
+        if not await self._check_len(self.name):
             data[self.name] = data[self.name][-abs(self.max_key_len):]
         data[self.name].append(self.time)
         return await self._write_data(data)
@@ -85,7 +96,8 @@ class Timer:
     async def calc_avg(self, custom_handler: str = None) -> dict:
         _ = await self._add_key
         _name = self.name if not custom_handler else custom_handler
-        _data = self._read_data[_name]
+        _data = await self._read_data
+        _data = _data[_name]
         _np_data = np.array(_data)
         return {
             "avg": sum(_data) / len(_data), "len": len(_data),
@@ -96,32 +108,37 @@ class Timer:
         } if _data else 0
 
     async def all_handlers(self) -> dict:
-        _data = self._all_data
+        _data = await self._all_data
         return {key: {
-            "time": self.calc_avg(key), "len": len_
+            "time": await self.calc_avg(key), "len": len_
         } for key, len_ in _data}
 
     @property
     async def build_response(self) -> str:
+        async def _modify_template(answer_: list) -> None:
+            answer_.insert(0, "-" * 20)
+            answer_.insert(0, reply_dict["timings_title_template"])
+            answer_.append("-" * 20)
+            answer_.append(reply_dict["sys_data_template"] % (
+                _system_data["cpu"], _system_data["memory"]["used_space"],
+                _system_data["memory"]["total_space"], _system_data["memory"]["used_perc"]
+            ))
+
+        async def _build_answer(_data: dict) -> list:
+            return [
+                _template % (
+                    _data[key]["time"]["len"], key, _data[key]["time"]["min"],
+                    _data[key]["time"]["avg"], _data[key]["time"]["max"],
+                    _data[key]["time"]["percentage"]["50"],
+                    _data[key]["time"]["percentage"]["95"]
+                ) for key in _data if key != "null"]
+
         _data = await self.all_handlers()
-        _system_data = {"memory": await SystemData().memory(), "cpu": await SystemData().cpu()}
-        _template = "{%d} <i>%s</i>: " \
-                    "<code>%.4f</code>/<code>%.4f</code>/<code>%.4f</code>/" \
-                    "<code>%.4f</code>/<code>%.4f</code>"
-        answer = [
-            _template % (
-                _data[key]["time"]["len"], key, _data[key]["time"]["min"],
-                _data[key]["time"]["avg"], _data[key]["time"]["max"],
-                _data[key]["time"]["percentage"]["50"],
-                _data[key]["time"]["percentage"]["95"]
-            ) for key in _data if key != "null"]
-        answer.insert(0, "-" * 20)
-        answer.insert(0, "{len} <i>function</i>: "
-                         "<code>min</code>/<code>avg</code>/<code>max</code>/"
-                         "<code>50%</code>/<code>95%</code>")
-        answer.append("-" * 20)
-        answer.append("CPU: %d%%; MEM: %s/%s (%d%%)" % (
-            _system_data["cpu"], _system_data["memory"]["used_space"], _system_data["memory"]["total_space"],
-            _system_data["memory"]["used_perc"]
-        ))
+        _system_data = {
+            "memory": await SystemData().memory(),
+            "cpu": await SystemData().cpu()}
+
+        _template = reply_dict["timings_template"]
+        answer = await _build_answer(_data)
+        await _modify_template(answer)
         return "\n".join(answer)

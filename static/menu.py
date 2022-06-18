@@ -1,8 +1,7 @@
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-from static.config import DONATE_LINK
 
+from static.config import DONATE_LINK
 
 dictionary = {
     "start_menu": ["Смотреть", "Добавить", "Топ", "Донат"],
@@ -15,6 +14,7 @@ dictionary = {
 donate_inline_button = InlineKeyboardMarkup().add(
     InlineKeyboardButton('Донат', url=DONATE_LINK)
 )
+
 
 async def build_menu(name: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False).add(

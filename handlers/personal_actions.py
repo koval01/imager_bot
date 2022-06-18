@@ -1,17 +1,18 @@
 from aiogram import types
-from aiogram.types import ChatType, ContentType
 from aiogram.dispatcher import FSMContext
-from dispatcher import dp, bot
-from static.messages import donate_answer, dictionary as dict_reply
-from static.menu import build_menu, dictionary as dict_menu
-from handlers.fsm import ViewContent, TakeContent
-from content.selector import Selector
+from aiogram.types import ChatType, ContentType
+
 from content.loader import LoaderContent
 from content.manager import Manager
+from content.selector import Selector
+from dispatcher import dp, bot
+from handlers.fsm import ViewContent, TakeContent
+from static.menu import build_menu, dictionary as dict_menu
+from static.messages import donate_answer, dictionary as dict_reply
+from utils.log_module import logger
+from utils.news import NewsSend
 from utils.throttling import rate_limit
 from utils.timer import Timer
-from utils.news import NewsSend
-from utils.log_module import logger
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])

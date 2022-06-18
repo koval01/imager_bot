@@ -1,6 +1,8 @@
-from content.manager import Manager
-from aiogram import types, Bot
 from typing import Tuple
+
+from aiogram import types, Bot
+
+from content.manager import Manager
 from static.messages import dictionary as dict_reply
 from utils.log_module import logger
 
@@ -16,12 +18,13 @@ class NewsSend:
         if len(text) > 3500:
             return 0, ""
         if not len(text):
-            return 0, "/news текст"
+            return 0, dict_reply["news_command_pattern"]
         successes = 0
         for user_id in users:
             try:
                 await self.bot.send_message(user_id, dict_reply["news_template"] % (
-                    text, self.message.from_user.full_name), disable_web_page_preview=False)
+                    text, self.message.from_user.full_name),
+                                            disable_web_page_preview=False)
                 successes += 1
             except Exception as e:
                 await logger.info("Error send message. Details: %s" % e)

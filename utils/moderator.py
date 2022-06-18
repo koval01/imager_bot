@@ -1,8 +1,10 @@
-from aiogram import types
-from database.controller import async_sql_session, engine as sql_engine
-from sqlalchemy.future import select
-from database.models import Moderator
 from typing import List
+
+from aiogram import types
+from sqlalchemy.future import select
+
+from database.controller import async_sql_session
+from database.models import Moderator
 from utils.decorators import async_timer
 
 

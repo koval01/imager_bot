@@ -26,6 +26,9 @@ class ChoiceType(TypeDecorator):
 class DictMixIn:
     """Provides a to_dict method to a SQLAlchemy database model."""
 
+    # def __init__(self):
+    #     self.__table__ = None
+
     def to_dict(self):
         return {
             column.name: getattr(self, column.name)
@@ -73,7 +76,9 @@ class User(Base):
     last_video = Column(BigInteger, default=0, nullable=False)
     last_voice = Column(BigInteger, default=0, nullable=False)
 
-    def __init__(self, user_id, tg_name_user, tg_username_user, banned, full_banned, last_photo, last_video, last_voice):
+    def __init__(
+            self, user_id, tg_name_user, tg_username_user,
+            banned, full_banned, last_photo, last_video, last_voice):
         self.user_id = user_id
         self.tg_name_user = tg_name_user
         self.tg_username_user = tg_username_user

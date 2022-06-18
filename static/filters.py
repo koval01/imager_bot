@@ -1,7 +1,8 @@
 from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
-from static import config
+
 from content.manager import Manager
+from static import config
 from utils.moderator import CheckModerator
 
 
