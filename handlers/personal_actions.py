@@ -142,6 +142,7 @@ async def invalid_select_content(msg: types.Message):
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["next_content"], state=ViewContent.view_mode)
+@dp.async_task
 @rate_limit(0.6, 'error_select_content_action')
 async def invalid_select_action(msg: types.Message):
     await msg.reply(
