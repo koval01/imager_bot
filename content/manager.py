@@ -127,11 +127,11 @@ class Manager:
     async def _get_content_query(self) -> Content:
         async with self.session.begin() as session:
             moderated_ = True
-            q = select(Content). \
+            q = select(Content).\
                 where(
                 Content.moderated == moderated_,
-                Content.type_content == self.type_content
-            )
+                Content.type_content == self.type_content).\
+                order_by(Content.id)
             result = await session.execute(q)
             curr = result.scalars()
             data = curr.all()
