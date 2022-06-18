@@ -5,6 +5,7 @@ from static.config import DISLIKE_DISABLED
 from static.menu import build_menu, dictionary as menu_dict
 from static.messages import dictionary as dict_reply
 from utils.log_module import logger
+from utils.moderator import CheckModerator
 
 
 class Selector:
@@ -56,10 +57,15 @@ class Selector:
             if not content_id or not file_id:
                 return await self.msg.reply(dict_reply["no_content"])
             menu = await build_menu("next_content")
+            moderator_status = await CheckModerator(self.msg)._check_user
+            need_protect = True \
+                if not moderator_status \
+                else False
             await _dislike_try(content_id, menu)
             return await eval(
                 f"self.msg.reply_{type_}(file_id, "
-                f"caption=str(content_id), reply_markup=menu, protect_content=True)"
+                f"caption=caption, reply_markup=menu, protect_content=need_protect)",
+                {"caption": str(content_id), "menu": menu, "need_protect": need_protect}
             )
         except Exception as e:
             await logger.error("Error send content (selector). Details: %s" % e)
