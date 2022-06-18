@@ -88,9 +88,14 @@ class Heroku:
             }
 
         data = await self._request("builds")
-        if data:
-            return _get_body(data[0]) \
-                if _check_build(data[0]) else {}
+        try:
+            data[0]
+        except Exception as e:
+            await logger.error(
+                "Error get data of build from Heroku API. Details: %s" % e)
+            return {}
+        return _get_body(data[0]) \
+            if _check_build(data[0]) else {}
 
     async def send_build_for_moderators(self) -> None:
         get_moderators = await CheckModerator().get_moderators
