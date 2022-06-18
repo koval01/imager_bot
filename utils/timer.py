@@ -23,7 +23,7 @@ class Timer:
     @property
     async def _read_data(self) -> Dict[str, int] or None:
         try:
-            value = await self.r.get(self.redis_var_name)
+            value = await self.r.hget(*tuple([self.redis_var_name]*2))
             return json.loads(value)
         except Exception as e:
             await logger.warning(
@@ -32,7 +32,7 @@ class Timer:
 
     async def _write_data(self, data: dict) -> bool:
         try:
-            await self.r.set(self.redis_var_name, json.dumps(data))
+            await self.r.hset(*tuple([self.redis_var_name]*2), json.dumps(data))
             return True
         except Exception as e:
             await logger.error(
