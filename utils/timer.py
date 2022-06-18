@@ -12,7 +12,8 @@ from utils.system_data import SystemData
 
 class Timer:
     def __init__(self, function: Callable = None, time: float = 0) -> None:
-        self.r = aioredis.from_url(REDIS_URL_ORG)
+        self.r = aioredis.from_url(
+            REDIS_URL_ORG, encoding="utf-8", decode_responses=True)
         self.redis_var_name = "timerDataDict"
         self.function = function
         self.name: str = function.__name__ if function else None
@@ -23,9 +24,7 @@ class Timer:
     async def _read_data(self) -> Dict[str, int] or None:
         try:
             value = await self.r.get(self.redis_var_name)
-            return json.loads(
-                value.decode("utf-8")
-            )
+            return json.loads(value)
         except Exception as e:
             await logger.warning(
                 "Error get key %s in Redis storage. Details: %s" %

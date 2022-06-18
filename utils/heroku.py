@@ -16,7 +16,8 @@ class Heroku:
         self.path = "apps/%s/%s"
         self.key = HEROKU_API_KEY
         self.app = HEROKU_APP_NAME
-        self.redis = aioredis.from_url(REDIS_URL_ORG)
+        self.redis = aioredis.from_url(
+            REDIS_URL_ORG, encoding="utf-8", decode_responses=True)
 
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
@@ -53,7 +54,7 @@ class Heroku:
         async def _get_key() -> str:
             try:
                 value = await self.redis.get(_redis_key)
-                return value.decode("utf-8")
+                return value
             except Exception as e:
                 await logger.warning(
                     "Error get key from Redis. Details: %s" % e)
