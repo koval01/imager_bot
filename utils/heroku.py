@@ -38,7 +38,7 @@ class Heroku:
                             f"Detail response: {response.text[:512]}")
             except Exception as e:
                 await logger.error(
-                    "Error send request to Google Analytics. Details: %s" % e)
+                    "Error send request to Heroku API. Details: %s" % e)
 
     @property
     async def build_check(self) -> bool:
@@ -59,7 +59,7 @@ class Heroku:
         _heroku_build_id = await self.get_build
         if not _heroku_build_id:
             await logger.warning(
-                "Skip build, error data get.")
+                "Skip build notify, error data get.")
             return False
 
         _redis_build_id = await _get_key()
