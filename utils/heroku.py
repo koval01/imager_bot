@@ -51,10 +51,12 @@ class Heroku:
 
         async def _set_key(value: str = "null") -> None:
             await self.redis.set(_redis_key, value)
+            await self.redis.close()
 
         async def _get_key() -> str:
             try:
                 value = await self.redis.get(_redis_key)
+                await self.redis.close()
                 return value
             except Exception as e:
                 await logger.warning(
