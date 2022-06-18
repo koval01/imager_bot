@@ -17,7 +17,8 @@ class Heroku:
         self.key = HEROKU_API_KEY
         self.app = HEROKU_APP_NAME
         self.redis = aioredis.from_url(
-            REDIS_URL_ORG, encoding="utf-8", decode_responses=True, max_connections=100)
+            REDIS_URL_ORG, encoding="utf-8",
+            decode_responses=True, max_connections=100)
 
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
