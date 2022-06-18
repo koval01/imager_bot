@@ -71,7 +71,8 @@ class LoaderContent:
         _type = await self._content_type
         if _type == "photo":
             return self.message.photo[-1:][0].file_id
-        return eval(f"self.message.{self._video_note_check(_type)}.file_id")
+        return eval(
+            f"self.message.{self._video_note_check(_type)}.file_id")
 
     @property
     async def _check_file_size(self) -> bool:
@@ -79,7 +80,8 @@ class LoaderContent:
         if _type == "photo":
             return True
         else:
-            _size = eval(f"self.message.{self._video_note_check(_type)}.file_size")
+            _size = eval(
+                f"self.message.{self._video_note_check(_type)}.file_size")
             return True if _size < 20971520 else False
 
     @property
@@ -97,7 +99,8 @@ class LoaderContent:
                 await session.close()
             return True
         except Exception as e:
-            await logger.error("Error add content to database. Details: %s" % e)
+            await logger.error(
+                "Error add content to database. Details: %s" % e)
             return False
 
     @property
@@ -114,7 +117,8 @@ class LoaderContent:
 
             return dict_reply["content_success"]
         except Exception as e:
-            await logger.warning("Add content init error. Details: %s" % e)
+            await logger.warning(
+                "Add content init error. Details: %s" % e)
             return dict_reply["internal_error"] % e.__class__.__name__
 
     @property

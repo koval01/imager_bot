@@ -1,10 +1,10 @@
 import json
-from typing import Callable
+from typing import Callable, Dict
 
 import numpy as np
-import redis
+import aioredis
 
-from static.config import REDIS_URL
+from static.config import REDIS_URL_ORG
 from static.messages import dictionary as reply_dict
 from utils.log_module import logger
 from utils.system_data import SystemData
@@ -12,56 +12,40 @@ from utils.system_data import SystemData
 
 class Timer:
     def __init__(self, function: Callable = None, time: float = 0) -> None:
-        self.r = redis.Redis(
-            host=REDIS_URL["host"], port=REDIS_URL["port"],
-            password=REDIS_URL["password"], ssl=False, max_connections=5000
-        )
+        self.r = aioredis.from_url(REDIS_URL_ORG)
         self.redis_var_name = "timerDataDict"
         self.function = function
         self.name: str = function.__name__ if function else None
         self.time = round(time, 4)
         self.max_key_len = 1000
 
-    async def _decode_redis(self, src):
-        if isinstance(src, list):
-            rv = list()
-            for key in src:
-                _key = await self._decode_redis(key)
-                rv.append(_key)
-            return rv
-        elif isinstance(src, dict):
-            rv = dict()
-            for key in src:
-                _key = await self._decode_redis(src[key])
-                rv[key.decode()] = _key
-            return rv
-        elif isinstance(src, bytes):
-            return src.decode()
-        else:
-            raise Exception("type not handled: " + type(src))
-
     @property
-    async def _read_data(self) -> dict:
-        _decoded = await self._decode_redis(
-            self.r.hgetall(self.redis_var_name)
-        )
-        return json.loads(
-            _decoded[self.redis_var_name]
-        )
+    async def _read_data(self) -> Dict[str, int] or None:
+        try:
+            value = await self.r.get(self.redis_var_name)
+            return json.loads(
+                value.decode("utf-8")
+            )
+        except Exception as e:
+            await logger.warning(
+                "Error get key %s in Redis storage. Details: %s" %
+                (self.redis_var_name, e))
 
     async def _write_data(self, data: dict) -> bool:
         try:
-            self.r.hset(self.redis_var_name, self.redis_var_name, json.dumps(data))
+            await self.r.set(self.redis_var_name, json.dumps(data))
             return True
         except Exception as e:
-            await logger.error("Error write data to Redis in timer. Details: %s" % e)
+            await logger.error(
+                "Error write data to Redis in timer. Details: %s" % e)
             return False
 
     @property
     async def _check_key(self) -> bool:
         data = await self._read_data
         return True if len([
-            key for key, data in data.items() if key == self.name
+            key for key, data in data.items()
+            if key == self.name
         ]) else False
 
     @property
@@ -80,7 +64,9 @@ class Timer:
     @property
     async def _all_data(self) -> list:
         data = await self._read_data
-        return [(key, len(data)) for key, data in data.items()]
+        return [
+            (key, len(data)) for key, data in data.items()
+        ]
 
     @property
     async def write_result(self) -> bool:
@@ -89,13 +75,16 @@ class Timer:
         _ = await self._add_key
         data = await self._read_data
         if not await self._check_len(self.name):
-            data[self.name] = data[self.name][-abs(self.max_key_len):]
+            data[self.name] = \
+                data[self.name][-abs(self.max_key_len):]
         data[self.name].append(self.time)
         return await self._write_data(data)
 
     async def calc_avg(self, custom_handler: str = None) -> dict:
         _ = await self._add_key
-        _name = self.name if not custom_handler else custom_handler
+        _name = self.name \
+            if not custom_handler \
+            else custom_handler
         _data = await self._read_data
         _data = _data[_name]
         _np_data = np.array(_data)
