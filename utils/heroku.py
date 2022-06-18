@@ -64,7 +64,7 @@ class Heroku:
 
         _redis_build_id = await _get_key()
 
-        await logger.debug(
+        await logger.info(
             "Build check. Last build ID from Heroku API - %s. "
             "Last build ID from Redis storage - %s" % (
                 _heroku_build_id["id"], _redis_build_id
@@ -99,4 +99,8 @@ class Heroku:
             template = dict_reply["build_data_template"] % (
                 dict_reply["build_updated"], *(v for k, v in build_data.items())
             )
-            [await bot.send_message(m, template) for m in get_moderators]
+            for m in get_moderators:
+                try:
+                    await bot.send_message(m, template)
+                except Exception as e:
+                    _ = e
