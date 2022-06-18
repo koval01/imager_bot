@@ -1,10 +1,13 @@
+from datetime import datetime
+
+import aioredis
 from aiohttp import ClientSession
+
+from dispatcher import bot
 from static.config import HEROKU_API_KEY, HEROKU_APP_NAME, REDIS_URL_ORG
 from static.messages import dictionary as dict_reply
 from utils.log_module import logger
 from utils.moderator import CheckModerator
-from dispatcher import bot
-import aioredis
 
 
 class Heroku:
@@ -78,11 +81,16 @@ class Heroku:
             return True if data_["status"] == "succeeded" \
                 else False
 
+        def _format_time(time_stamp: str) -> str:
+            return datetime.strptime(
+                time_stamp, '%Y-%m-%dT%H:%M:%SZ'
+            ).strftime("%Y-%m-%d %H:%M:%S")
+
         def _get_body(data_: dict) -> dict:
             return {
                 "id": data_["id"],
-                "created_at": data_["created_at"],
-                "updated_at": data_["updated_at"],
+                "created_at": _format_time(data_["created_at"]),
+                "updated_at": _format_time(data_["updated_at"]),
                 "description": data_["source_blob"]["version_description"].strip(),
                 "output_stream_url": data_["output_stream_url"]
             }
