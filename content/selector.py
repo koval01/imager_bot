@@ -64,8 +64,11 @@ class Selector:
             await _dislike_try(content_id, menu)
             return await eval(
                 f"self.msg.reply_{type_}(file_id, "
-                f"caption=caption, reply_markup=menu, protect_content=need_protect)",
-                {"caption": str(content_id), "menu": menu, "need_protect": need_protect}
+                "caption=caption, reply_markup=menu, protect_content=need_protect)",
+                {
+                    "self": self, "file_id": file_id, "caption": str(content_id),
+                    "menu": menu, "need_protect": need_protect
+                }
             )
         except Exception as e:
             await logger.error("Error send content (selector). Details: %s" % e)
