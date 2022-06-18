@@ -32,5 +32,6 @@ async def shutdown_actions(dp_: Dispatcher) -> None:
 if __name__ == "__main__":
     executor.start_polling(
         dp, skip_updates=True,
+        relax=0.05,
         on_startup=startup_actions,
         on_shutdown=shutdown_actions)
