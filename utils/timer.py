@@ -13,7 +13,7 @@ from utils.system_data import SystemData
 class Timer:
     def __init__(self, function: Callable = None, time: float = 0) -> None:
         self.r = aioredis.from_url(
-            REDIS_URL_ORG, encoding="utf-8", decode_responses=True)
+            REDIS_URL_ORG, encoding="utf-8", decode_responses=True, max_connections=5000)
         self.redis_var_name = "timerDataDict"
         self.function = function
         self.name: str = function.__name__ if function else None
