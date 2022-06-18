@@ -77,20 +77,20 @@ class Heroku:
 
     @property
     async def get_build(self) -> dict:
-        def _check_build(data_: dict) -> bool:
+        async def _check_build(data_: dict) -> bool:
             return True if data_["status"] == "succeeded" \
                 else False
 
-        def _format_time(time_stamp: str) -> str:
+        async def _format_time(time_stamp: str) -> str:
             return datetime.strptime(
                 time_stamp, '%Y-%m-%dT%H:%M:%SZ'
             ).strftime("%Y-%m-%d %H:%M:%S")
 
-        def _get_body(data_: dict) -> dict:
+        async def _get_body(data_: dict) -> dict:
             return {
                 "id": data_["id"],
-                "created_at": _format_time(data_["created_at"]),
-                "updated_at": _format_time(data_["updated_at"]),
+                "created_at": await _format_time(data_["created_at"]),
+                "updated_at": await _format_time(data_["updated_at"]),
                 "description": data_["source_blob"]["version_description"].strip(),
                 "output_stream_url": data_["output_stream_url"]
             }
@@ -105,8 +105,8 @@ class Heroku:
             await logger.error(
                 "Error get data of build from Heroku API. Details: %s" % e)
             return {}
-        return _get_body(data[0]) \
-            if _check_build(data[0]) else {}
+        return await _get_body(data[0]) \
+            if await _check_build(data[0]) else {}
 
     async def send_build_for_moderators(self) -> None:
         get_moderators = await CheckModerator().get_moderators
