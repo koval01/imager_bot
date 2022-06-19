@@ -15,6 +15,7 @@ def rate_limit(limit: float, key=None):
     :param key:
     :return:
     """
+
     def decorator(func):
         setattr(func, 'throttling_rate_limit', limit)
         if key:

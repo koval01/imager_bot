@@ -3,14 +3,14 @@ import os
 import sentry_sdk
 from aiogram import executor, Dispatcher
 
+import handlers
 from database.controller import engine as sql_engine
 from dispatcher import dp
-from utils.log_module import logger
 from utils.heroku import Heroku
-
-import handlers
+from utils.log_module import *
 
 _ = handlers.__init__
+_ = logging
 
 sentry_sdk.init(
     os.getenv("SENTRY_BOT"),
@@ -19,13 +19,13 @@ sentry_sdk.init(
 
 
 async def startup_actions(dp_: Dispatcher) -> None:
+    _ = dp_
     await Heroku().send_build_for_moderators()
 
 
 async def shutdown_actions(dp_: Dispatcher) -> None:
     await dp_.storage.close()
     await dp_.storage.wait_closed()
-    await logger.shutdown()
     await sql_engine.dispose()
 
 

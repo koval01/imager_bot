@@ -1,3 +1,4 @@
+import logging as log
 from typing import List, Dict, Any
 
 import numpy as np
@@ -9,7 +10,6 @@ from database.controller import async_sql_session
 from database.models import Content, User
 from static.messages import dictionary as msg_dict
 from utils.decorators import async_timer
-from utils.log_module import logger
 
 
 class Manager:
@@ -37,7 +37,7 @@ class Manager:
                 await session.close()
             return data
         except Exception as e:
-            await logger.warning(
+            log.warning(
                 "Error search user in database. Details: %s" % e)
 
     @property
@@ -114,12 +114,12 @@ class Manager:
                     tg_name_user=self.message.from_user.full_name,
                     tg_username_user=username if username else "N/A"
                 )
-                await logger.debug("Update name for user. Request: %s" % q)
+                log.debug("Update name for user. Request: %s" % q)
                 await session.commit()
                 await session.close()
             return True
         except Exception as e:
-            await logger.warning("Error update user. Details: %s" % e)
+            log.warning("Error update user. Details: %s" % e)
             return False
 
     @async_timer
@@ -143,7 +143,7 @@ class Manager:
                 await session.close()
             return True
         except Exception as e:
-            await logger.warning("Error add user. Details: %s" % e)
+            log.warning("Error add user. Details: %s" % e)
             return False
 
     @property
@@ -256,22 +256,22 @@ class Manager:
             return _array[0]
 
         content = await self._get_content_query
-        await logger.debug(
+        log.debug(
             "Random get content = %s" % self.get_content_random)
         if not self.get_content_random:
             _selector = await self._get_last_id
-            await logger.debug("Selector for %d is %d" % (
+            log.debug("Selector for %d is %d" % (
                 self.user_id, _selector))
             try:
                 content[_selector]
             except IndexError:
                 return
             content_list = content[:]
-            await logger.debug("Get content: last_id = %d" % _selector)
+            log.debug("Get content: last_id = %d" % _selector)
         else:
             _selector = await _random_select(content, samples=50)
             content_list = content[:]
-            await logger.debug("Get content: rand = %d" % _selector)
+            log.debug("Get content: rand = %d" % _selector)
         return None if not await self._update_last_id_content \
             else \
             (
@@ -302,16 +302,16 @@ class Manager:
             async with self.session.begin() as session:
                 q = update(User). \
                     values(eval(
-                        "{User.last_%s: User.last_%s + 1}" %
-                        tuple([self.type_content] * 2)
-                    )).where(User.user_id == self.user_id)
+                    "{User.last_%s: User.last_%s + 1}" %
+                    tuple([self.type_content] * 2)
+                )).where(User.user_id == self.user_id)
                 await session.execute(q)
                 await session.commit()
                 await session.close()
-                await logger.debug("Update last id. Request: %s" % q)
+                log.debug("Update last id. Request: %s" % q)
             return True
         except Exception as e:
-            await logger.error(
+            log.error(
                 "Error update last id content for user. Details: %s" % e)
             return False
 
@@ -328,11 +328,11 @@ class Manager:
                 await session.execute(q)
                 await session.commit()
                 await session.close()
-                await logger.debug(
+                log.debug(
                     "Add dislike for content. Request: %s" % q)
             return True
         except Exception as e:
-            await logger.error(
+            log.error(
                 "Error add dislike for content id: %d. Details: %s" %
                 (content_id, e))
             return False

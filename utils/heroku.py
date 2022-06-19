@@ -1,3 +1,4 @@
+import logging as log
 from datetime import datetime
 
 import aioredis
@@ -6,7 +7,6 @@ from aiohttp import ClientSession
 from dispatcher import bot
 from static.config import HEROKU_API_KEY, HEROKU_APP_NAME, REDIS_URL_ORG
 from static.messages import dictionary as dict_reply
-from utils.log_module import logger
 from utils.moderator import CheckModerator
 
 
@@ -33,19 +33,19 @@ class Heroku:
         async with ClientSession() as session:
             try:
                 async with session.get(
-                    f"https://{self.host}/{self.path % (self.app, func)}",
-                    headers=self.headers
+                        f"https://{self.host}/{self.path % (self.app, func)}",
+                        headers=self.headers
                 ) as response:
                     if response.status >= 200 < 300:
-                        await logger.debug("Heroku response success.")
+                        log.debug("Heroku response success.")
                         json_body = await response.json()
                         return json_body
                     else:
-                        await logger.warning(
+                        log.warning(
                             f"Error code Heroku API: {response.status}. "
                             f"Detail response: {response.text[:512]}")
             except Exception as e:
-                await logger.error(
+                log.error(
                     "Error send request to Heroku API. Details: %s" % e)
 
     @property
@@ -66,19 +66,19 @@ class Heroku:
                 await self.redis.close()
                 return value
             except Exception as e:
-                await logger.warning(
+                log.warning(
                     "Error get key from Redis. Details: %s" % e)
                 await _set_key()
 
         _heroku_build_id = await self.get_build
         if not _heroku_build_id:
-            await logger.warning(
+            log.warning(
                 "Skip build notify, error data get.")
             return False
 
         _redis_build_id = await _get_key()
 
-        await logger.info(
+        log.info(
             "Build check. Last build ID from Heroku API - %s. "
             "Last build ID from Redis storage - %s" % (
                 _heroku_build_id["id"], _redis_build_id
@@ -111,13 +111,13 @@ class Heroku:
             }
 
         data = await self._request("builds")
-        await logger.info(
+        log.info(
             "Heroku builds count: %d, data type: %s" % (
                 len(data), type(data)))
         try:
             data[0]
         except Exception as e:
-            await logger.error(
+            log.error(
                 "Error get data of build from Heroku API. Details: %s" % e)
             return {}
         return await _get_body(data[0]) \

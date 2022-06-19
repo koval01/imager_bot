@@ -1,3 +1,5 @@
+import logging as log
+
 from aiogram.dispatcher.handler import current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.types import Message
@@ -6,7 +8,6 @@ from aiohttp import ClientSession
 from content.manager import Manager
 from static.config import GA_ID, GA_SECRET
 from utils.decorators import async_timer
-from utils.log_module import logger
 
 
 class Analytics:
@@ -31,13 +32,13 @@ class Analytics:
                         f"https://{self.host}/{self.path}", json=json, params=params
                 ) as response:
                     if response.status >= 200 < 300:
-                        await logger.debug("OK code Google Analytics")
+                        log.debug("OK code Google Analytics")
                     else:
-                        await logger.warning(
+                        log.warning(
                             f"Error code Google Analytics: {response.status}. "
                             f"Detail response: {response.text[:512]}")
             except Exception as e:
-                await logger.error(
+                log.error(
                     "Error send request to Google Analytics. Details: %s" % e)
 
     @property
@@ -79,7 +80,7 @@ class AnalyticsMiddleware(BaseMiddleware):
     @staticmethod
     async def _update_user(message: Message) -> None:
         user_check = await Manager(message=message).check_user()
-        await logger.debug(
+        log.debug(
             "Error check user. (Google Analytics middleware)") \
             if not user_check else None
 

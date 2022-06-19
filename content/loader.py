@@ -8,7 +8,6 @@ from database.models import Content
 from static import config
 from static.messages import dictionary as dict_reply
 from utils.decorators import async_timer
-from utils.log_module import logger
 from utils.moderator import CheckModerator
 
 
@@ -125,7 +124,7 @@ class LoaderContent:
                 await session.close()
             return True
         except Exception as e:
-            await logger.error(
+            log.error(
                 "Error add content to database. Details: %s" % e)
             return False
 
@@ -146,7 +145,7 @@ class LoaderContent:
 
             return dict_reply["content_success"]
         except Exception as e:
-            await logger.warning(
+            log.warning(
                 "Add content init error. Details: %s" % e)
             return dict_reply["internal_error"] % e.__class__.__name__
 

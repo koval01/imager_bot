@@ -1,10 +1,11 @@
+import logging as log
+
 from aiogram.types import Message, ReplyKeyboardMarkup
 
 from content.manager import Manager
 from static.config import DISLIKE_DISABLED
 from static.menu import build_menu, dictionary as menu_dict
 from static.messages import dictionary as dict_reply
-from utils.log_module import logger
 from utils.moderator import CheckModerator
 
 
@@ -62,7 +63,7 @@ class Selector:
                 type_content=type_, message=self.msg,
                 get_content_random=self._select_order_mode
             ).get_content()
-            await logger.info(
+            log.info(
                 f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
             if not content_id or not file_id:
                 return await self.msg.reply(dict_reply["no_content"])
@@ -81,5 +82,5 @@ class Selector:
                 }
             )
         except Exception as e:
-            await logger.error("Error send content (selector). Details: %s" % e)
+            log.error("Error send content (selector). Details: %s" % e)
             return await self.msg.reply(dict_reply["internal_error"] % e.__class__.__name__)

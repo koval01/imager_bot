@@ -1,3 +1,5 @@
+import logging as log
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ChatType, ContentType
@@ -9,11 +11,10 @@ from dispatcher import dp, bot
 from handlers.fsm import ViewContent, TakeContent
 from static.menu import build_menu, dictionary as dict_menu
 from static.messages import donate_answer, dictionary as dict_reply
-from utils.log_module import logger
+from utils.heroku import Heroku
 from utils.news import NewsSend
 from utils.throttling import rate_limit
 from utils.timer import Timer
-from utils.heroku import Heroku
 
 
 @dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
@@ -48,7 +49,7 @@ async def send_welcome(msg: types.Message, state: FSMContext):
 @dp.message_handler(commands=['test_log'], state="*", is_owner=True)
 async def test_log_handler(msg: types.Message):
     await msg.reply(dict_reply["test_log_reply"])
-    await logger.info("Test log called from bot by admin.")
+    log.info("Test log called from bot by admin.")
 
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)

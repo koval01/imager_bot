@@ -1,12 +1,12 @@
 import json
+import logging as log
 from typing import Callable, Dict
 
-import numpy as np
 import aioredis
+import numpy as np
 
 from static.config import REDIS_URL_ORG
 from static.messages import dictionary as reply_dict
-from utils.log_module import logger
 from utils.system_data import SystemData
 
 
@@ -28,11 +28,11 @@ class Timer:
         """
         try:
             value = await self.r.hget(
-                *tuple([self.redis_var_name]*2))
+                *tuple([self.redis_var_name] * 2))
             await self.r.close()
             return json.loads(value)
         except Exception as e:
-            await logger.warning(
+            log.warning(
                 "Error get key %s in Redis storage. Details: %s" %
                 (self.redis_var_name, e))
 
@@ -42,13 +42,12 @@ class Timer:
         """
         try:
             await self.r.hset(
-                *tuple([self.redis_var_name]*2),
+                *tuple([self.redis_var_name] * 2),
                 json.dumps(data))
             await self.r.close()
             return True
         except Exception as e:
-            await logger.error(
-                "Error write data to Redis in timer. Details: %s" % e)
+            self.error = log.error("Error write data to Redis in timer. Details: %s" % e)
             return False
 
     @property
