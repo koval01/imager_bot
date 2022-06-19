@@ -105,6 +105,10 @@ class Timer:
         data[self.name].append(self.time)
         return await self._write_data(data)
 
+    @property
+    async def data_flush(self) -> bool:
+        return await self._write_data({})
+
     async def calc_avg(self, custom_handler: str = None) -> dict:
         """
         Calc average execution function time

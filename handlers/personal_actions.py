@@ -84,6 +84,11 @@ async def timings_check(msg: types.Message):
     await msg.reply(await Timer().build_response)
 
 
+@dp.message_handler(commands=['flush_timings'], state="*", is_owner=True)
+async def timings_check(msg: types.Message):
+    await msg.reply(dict_reply["timings_flush"] % await Timer().data_flush)
+
+
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])
 async def init_select(msg: types.Message):
     await ViewContent.select_mode.set()

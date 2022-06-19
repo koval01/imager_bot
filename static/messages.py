@@ -69,7 +69,8 @@ dictionary = {
                            "\nВремя инициализации: <i>%s</i>"
                            "\nВремя публикации: <i>%s</i>"
                            "\nОписание: (<i>%s</i>)"
-                           "\nЖурнал сборки: <b><a href=\"%s\">Посмотреть</a></b>"
+                           "\nЖурнал сборки: <b><a href=\"%s\">Посмотреть</a></b>",
+    "timings_flush": "Информация о таймингах очищена. (%s)"
 }
 
 async def donate_answer(random: bool = False) -> (dict, bool):
