@@ -92,20 +92,20 @@ class Heroku:
         Check and return build data in dict type
         """
 
-        async def _check_build(data_: dict) -> bool:
+        def _check_build(data_: dict) -> bool:
             return True if data_["status"] == "succeeded" \
                 else False
 
-        async def _format_time(time_stamp: str) -> str:
+        def _format_time(time_stamp: str) -> str:
             return datetime.strptime(
                 time_stamp, '%Y-%m-%dT%H:%M:%SZ'
             ).strftime("%Y-%m-%d %H:%M:%S")
 
-        async def _get_body(data_: dict) -> dict:
+        def _get_body(data_: dict) -> dict:
             return {
                 "id": data_["id"],
-                "created_at": await _format_time(data_["created_at"]),
-                "updated_at": await _format_time(data_["updated_at"]),
+                "created_at": _format_time(data_["created_at"]),
+                "updated_at": _format_time(data_["updated_at"]),
                 "description": data_["source_blob"]["version_description"].strip(),
                 "output_stream_url": data_["output_stream_url"]
             }
@@ -120,8 +120,8 @@ class Heroku:
             log.error(
                 "Error get data of build from Heroku API. Details: %s" % e)
             return {}
-        return await _get_body(data[0]) \
-            if await _check_build(data[0]) else {}
+        return _get_body(data[0]) \
+            if _check_build(data[0]) else {}
 
     async def send_build_for_moderators(self) -> None:
         """

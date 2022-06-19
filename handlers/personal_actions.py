@@ -67,8 +67,7 @@ async def build_data_handler(msg: types.Message):
 
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
 async def timings_check(msg: types.Message):
-    await msg.reply(
-        await Timer().build_response)
+    await msg.reply(await Timer().build_response)
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][0])

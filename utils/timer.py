@@ -47,7 +47,7 @@ class Timer:
             await self.r.close()
             return True
         except Exception as e:
-            self.error = log.error("Error write data to Redis in timer. Details: %s" % e)
+            log.error("Error write data to Redis in timer. Details: %s" % e)
             return False
 
     @property
@@ -139,7 +139,7 @@ class Timer:
         Formatted response with statistics
         """
 
-        async def _modify_template(answer_: list) -> None:
+        def _modify_template(answer_: list) -> None:
             answer_.insert(0, "-" * 20)
             answer_.insert(0, reply_dict["timings_title_template"])
             answer_.append("-" * 20)
@@ -148,7 +148,7 @@ class Timer:
                 _system_data["memory"]["total_space"], _system_data["memory"]["used_perc"]
             ))
 
-        async def _build_answer(_data: dict) -> list:
+        def _build_answer(_data: dict) -> list:
             return [
                 _template % (
                     _data[key]["time"]["len"], key, _data[key]["time"]["min"],
@@ -159,10 +159,10 @@ class Timer:
 
         _data = await self.all_handlers()
         _system_data = {
-            "memory": await SystemData().memory(),
-            "cpu": await SystemData().cpu()}
+            "memory": SystemData().memory(),
+            "cpu": SystemData().cpu()}
 
         _template = reply_dict["timings_template"]
-        answer = await _build_answer(_data)
-        await _modify_template(answer)
+        answer = _build_answer(_data)
+        _modify_template(answer)
         return "\n".join(answer)

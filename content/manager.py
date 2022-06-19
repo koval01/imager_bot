@@ -181,14 +181,12 @@ class Manager:
         return data
 
     @staticmethod
-    @async_timer
-    async def _build_top_list(content: Content, users: User, len_: int = 10) -> List[dict]:
+    def _build_top_list(content: Content, users: User, len_: int = 10) -> List[dict]:
         """
         Builder top list
         """
 
-        @async_timer
-        async def _sort_by_ids_top_list() -> Dict[list, Any]:
+        def _sort_by_ids_top_list() -> Dict[list, Any]:
             content_ = content[:]
             result = {}
             for c in content_:
@@ -198,15 +196,13 @@ class Manager:
                     result.update({c.loader_id: 1})
             return result
 
-        @async_timer
-        async def _sort_users_by_len_top(users_dict: dict) -> list:
+        def _sort_users_by_len_top(users_dict: dict) -> list:
             return sorted(
                 [v for v in users_dict.items()],
                 key=lambda x: x[1], reverse=True
             )
 
-        @async_timer
-        async def _get_user_name_top(user_id: int, users_: list) -> str:
+        def _get_user_name_top(user_id: int, users_: list) -> str:
             return [
                 user.tg_name_user
                 for user in users_[:]
@@ -215,14 +211,14 @@ class Manager:
 
         _template = msg_dict["top_list_template"]
         _users = \
-            await _sort_users_by_len_top(
-                await _sort_by_ids_top_list())
+            _sort_users_by_len_top(
+                _sort_by_ids_top_list())
         _users_array = users[:]
 
         return [
             {
                 "message": _template % (
-                    i + 1, await _get_user_name_top(
+                    i + 1, _get_user_name_top(
                         _users[i][0], _users_array),
                     _users[i][1]),
                 "data": {
@@ -237,7 +233,7 @@ class Manager:
     async def get_top(self) -> str:
         return "%s\n(%s)" % ("\n".join([
             line["message"] for line in
-            await self._build_top_list(
+            self._build_top_list(
                 await self._get_all_content(moderated=True),
                 await self._get_all_users)
         ]), msg_dict["top_list_comment"])
@@ -248,8 +244,7 @@ class Manager:
         Order formatted content data
         """
 
-        @async_timer
-        async def _random_select(content_data: list, samples: int = 10) -> int:
+        def _random_select(content_data: list, samples: int = 10) -> int:
             _array = np.random.choice(
                 len(content_data[:]), samples, replace=True)
             np.random.shuffle(_array)
@@ -269,7 +264,7 @@ class Manager:
             content_list = content[:]
             log.debug("Get content: last_id = %d" % _selector)
         else:
-            _selector = await _random_select(content, samples=50)
+            _selector = _random_select(content, samples=50)
             content_list = content[:]
             log.debug("Get content: rand = %d" % _selector)
         return None if not await self._update_last_id_content \
@@ -300,11 +295,10 @@ class Manager:
         """
         try:
             async with self.session.begin() as session:
-                q = update(User). \
-                    values(eval(
-                    "{User.last_%s: User.last_%s + 1}" %
-                    tuple([self.type_content] * 2)
-                )).where(User.user_id == self.user_id)
+                q = update(User).values(
+                    eval("{User.last_%s: User.last_%s + 1}"
+                         % tuple([self.type_content] * 2))).where(
+                    User.user_id == self.user_id)
                 await session.execute(q)
                 await session.commit()
                 await session.close()

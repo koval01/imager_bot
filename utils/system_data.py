@@ -5,7 +5,7 @@ from utils.math_ops import Math
 
 class SystemData:
     @staticmethod
-    async def memory() -> dict:
+    def memory() -> dict:
         _data = psutil.virtual_memory()
         return {
             "used_perc": _data.percent,
@@ -14,5 +14,5 @@ class SystemData:
         }
 
     @staticmethod
-    async def cpu() -> float:
+    def cpu() -> float:
         return psutil.cpu_percent()
