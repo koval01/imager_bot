@@ -244,7 +244,7 @@ class Manager:
         Order formatted content data
         """
 
-        def _random_select(content_data: list, samples: int = 10) -> int:
+        async def _random_select(content_data: list, samples: int = 10) -> int:
             _array = np.random.choice(
                 len(content_data[:]), samples, replace=True)
             np.random.shuffle(_array)
@@ -264,7 +264,7 @@ class Manager:
             content_list = content[:]
             log.debug("Get content: last_id = %d" % _selector)
         else:
-            _selector = _random_select(content, samples=50)
+            _selector = await _random_select(content, samples=50)
             content_list = content[:]
             log.debug("Get content: rand = %d" % _selector)
         return None if not await self._update_last_id_content \
