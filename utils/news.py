@@ -13,6 +13,9 @@ class NewsSend:
         self.bot = bot
 
     async def _send_messages(self) -> Tuple[int, str]:
+        """
+        Format and send news message to users
+        """
         users = await Manager().get_all_users_ids
         text = self.message.get_args()
         if len(text) > 3500:

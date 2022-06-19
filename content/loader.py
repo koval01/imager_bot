@@ -8,6 +8,7 @@ from static.messages import dictionary as dict_reply
 from utils.decorators import async_timer
 from utils.log_module import logger
 from utils.moderator import CheckModerator
+import logging as log
 
 
 class LoaderContent:
@@ -16,7 +17,10 @@ class LoaderContent:
         self.message = message
 
     @property
-    async def _content_type(self) -> str:
+    def _content_type(self) -> str:
+        """
+        Resolve content type with ordered media from user
+        """
         try:
             _type = self.message.content_type
             return "video" if _type == "video_note" else \
@@ -25,7 +29,7 @@ class LoaderContent:
                     if t == _type
                 ][0]
         except Exception as e:
-            await logger.warning(
+            log.warning(
                 "Error resolve content type (%s). Details: %s" % (
                     self._content_type.__name__, e))
             return ""
@@ -33,6 +37,9 @@ class LoaderContent:
     @property
     @async_timer
     async def _check_content_on_moderation(self) -> int:
+        """
+        Count content on moderation by user
+        """
         async with self.session.begin() as session:
             moderated_ = False
             q = select(Content).where(
@@ -46,17 +53,26 @@ class LoaderContent:
 
     @property
     async def _allow_load(self) -> bool:
+        """
+        Check allow load for user
+        """
         return True if (await self._content_type and (
                 await self._check_content_on_moderation <= 100)
                         ) else False
 
     @property
     async def _this_is_moderator(self) -> bool:
+        """
+        Check moderator status for user
+        """
         user_id = self.message.from_user.id
         return True if await CheckModerator(self.message).get \
                        or user_id == config.BOT_OWNER else False
 
-    async def _video_note_check(self, current_type: str) -> str:
+    def _video_note_check(self, current_type: str) -> str:
+        """
+        Check content type by video-note
+        """
         try:
             if self.message.video_note:
                 return "video_note"
@@ -67,16 +83,22 @@ class LoaderContent:
         return current_type
 
     @property
-    async def _get_file_id(self) -> str:
-        _type = await self._content_type
+    def _get_file_id(self) -> str:
+        """
+        Get file id from ordered media
+        """
+        _type = self._content_type
         if _type == "photo":
             return self.message.photo[-1:][0].file_id
         return eval(
             f"self.message.{self._video_note_check(_type)}.file_id")
 
     @property
-    async def _check_file_size(self) -> bool:
-        _type = await self._content_type
+    def _check_file_size(self) -> bool:
+        """
+        Check file size (max 20 mb)
+        """
+        _type = self._content_type
         if _type == "photo":
             return True
         else:
@@ -87,12 +109,15 @@ class LoaderContent:
     @property
     @async_timer
     async def _write_content_to_database(self) -> bool:
+        """
+        Write content to database
+        """
         try:
             async with self.session.begin() as session:
                 session.add(Content(
-                    type_content=await self._content_type,
+                    type_content=self._content_type,
                     loader_id=self.message.from_user.id,
-                    file_id=await self._get_file_id,
+                    file_id=self._get_file_id,
                     moderated=await self._this_is_moderator
                 ))
                 await session.commit()
@@ -105,8 +130,11 @@ class LoaderContent:
 
     @property
     async def add_content(self) -> str:
+        """
+        Check all rules and write content to database
+        """
         try:
-            if not await self._check_file_size:
+            if not self._check_file_size:
                 return dict_reply["big_size_file"]
 
             if not await self._allow_load:

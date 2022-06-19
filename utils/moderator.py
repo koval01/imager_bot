@@ -16,6 +16,9 @@ class CheckModerator:
     @property
     @async_timer
     async def _check_user(self) -> bool:
+        """
+        Check user moderator status
+        """
         async with self.session.begin() as session:
             q = select(Moderator).where(
                 Moderator.tg_user_id == self.message.from_user.id)
@@ -28,6 +31,9 @@ class CheckModerator:
     @property
     @async_timer
     async def get_moderators(self) -> List[int] or None:
+        """
+        Get list moderators (ids)
+        """
         async with self.session.begin() as session:
             q = select(Moderator).order_by(Moderator.tg_user_id)
             result = await session.execute(q)

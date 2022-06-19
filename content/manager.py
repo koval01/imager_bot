@@ -25,6 +25,9 @@ class Manager:
 
     @async_timer
     async def _get_user(self) -> User or None:
+        """
+        Get user by user id
+        """
         try:
             async with self.session.begin() as session:
                 q = select(User).where(User.user_id == self.user_id)
@@ -40,6 +43,9 @@ class Manager:
     @property
     @async_timer
     async def _get_all_users(self) -> List[User] or None:
+        """
+        Get full list users
+        """
         async with self.session.begin() as session:
             q = select(User).order_by(User.id)
             result = await session.execute(q)
@@ -51,10 +57,16 @@ class Manager:
     @property
     @async_timer
     async def get_all_users_ids(self) -> List[int] or None:
+        """
+        Convert all users query to python list
+        """
         return [user.user_id for user in await self._get_all_users]
 
     @property
     async def check_ban(self) -> bool:
+        """
+        Check ban content load
+        """
         if await self.check_user():
             user = await self._get_user()
             return True if user.banned else False
@@ -62,6 +74,9 @@ class Manager:
 
     @property
     async def check_full_ban(self) -> bool:
+        """
+        Check full close access to bot
+        """
         if await self.check_user():
             user = await self._get_user()
             return True if user.full_banned else False
@@ -69,6 +84,9 @@ class Manager:
 
     @async_timer
     async def check_user(self) -> bool:
+        """
+        Check user status
+        """
         user = await self._get_user()
         if not user:
             return True if \
@@ -84,6 +102,9 @@ class Manager:
     @property
     @async_timer
     async def _update_user_name(self) -> bool:
+        """
+        Update name user and username in database
+        """
         try:
             async with self.session.begin() as session:
                 username = self.message.from_user.username
@@ -103,6 +124,9 @@ class Manager:
 
     @async_timer
     async def _add_user(self) -> bool:
+        """
+        Add user to database
+        """
         try:
             async with self.session.begin() as session:
                 session.add(User(
@@ -125,6 +149,9 @@ class Manager:
     @property
     @async_timer
     async def _get_content_query(self) -> Content:
+        """
+        Get moderated content by category
+        """
         async with self.session.begin() as session:
             moderated_ = True
             q = select(Content).\
@@ -140,6 +167,9 @@ class Manager:
 
     @async_timer
     async def _get_all_content(self, moderated: bool = True) -> Content:
+        """
+        Get all content
+        """
         async with self.session.begin() as session:
             q = select(Content). \
                 order_by(Content.id). \
@@ -153,6 +183,9 @@ class Manager:
     @staticmethod
     @async_timer
     async def _build_top_list(content: Content, users: User, len_: int = 10) -> List[dict]:
+        """
+        Builder top list
+        """
 
         @async_timer
         async def _sort_by_ids_top_list() -> Dict[list, Any]:
@@ -211,6 +244,9 @@ class Manager:
 
     @property
     async def _get_content(self) -> tuple or None:
+        """
+        Order formatted content data
+        """
 
         @async_timer
         async def _random_select(content_data: list, samples: int = 10) -> int:
@@ -248,6 +284,9 @@ class Manager:
     @property
     @async_timer
     async def _get_last_id(self) -> int:
+        """
+        Get id last viewed content by category
+        """
         x = await self._get_user()
         return eval(
             f"int(x.last_{self.type_content})",
@@ -256,6 +295,9 @@ class Manager:
     @property
     @async_timer
     async def _update_last_id_content(self) -> bool:
+        """
+        Update counter last ordered content by category
+        """
         try:
             async with self.session.begin() as session:
                 q = update(User).\
@@ -276,6 +318,9 @@ class Manager:
 
     @async_timer
     async def add_dislike(self, content_id: int) -> bool:
+        """
+        Add user to disliked users list for content
+        """
         try:
             async with self.session.begin() as session:
                 q = update(Content).\

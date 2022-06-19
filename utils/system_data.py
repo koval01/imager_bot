@@ -9,8 +9,8 @@ class SystemData:
         _data = psutil.virtual_memory()
         return {
             "used_perc": _data.percent,
-            "used_space": await Math.convert_size_data(_data.used),
-            "total_space": await Math.convert_size_data(_data.total)
+            "used_space": Math.convert_size_data(_data.used),
+            "total_space": Math.convert_size_data(_data.total)
         }
 
     @staticmethod

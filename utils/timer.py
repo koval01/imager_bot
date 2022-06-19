@@ -23,8 +23,12 @@ class Timer:
 
     @property
     async def _read_data(self) -> Dict[str, int] or None:
+        """
+        Read timer data from Redis
+        """
         try:
-            value = await self.r.hget(*tuple([self.redis_var_name]*2))
+            value = await self.r.hget(
+                *tuple([self.redis_var_name]*2))
             await self.r.close()
             return json.loads(value)
         except Exception as e:
@@ -33,8 +37,13 @@ class Timer:
                 (self.redis_var_name, e))
 
     async def _write_data(self, data: dict) -> bool:
+        """
+        Write timer data to Redis
+        """
         try:
-            await self.r.hset(*tuple([self.redis_var_name]*2), json.dumps(data))
+            await self.r.hset(
+                *tuple([self.redis_var_name]*2),
+                json.dumps(data))
             await self.r.close()
             return True
         except Exception as e:
@@ -44,6 +53,9 @@ class Timer:
 
     @property
     async def _check_key(self) -> bool:
+        """
+        Method for validate key
+        """
         data = await self._read_data
         return True if len([
             key for key, data in data.items()
@@ -52,12 +64,18 @@ class Timer:
 
     @property
     async def _add_key(self) -> bool:
+        """
+        Add key to dict
+        """
         data = await self._read_data
         data.update({self.name: [self.time]}) \
             if not await self._check_key else None
         return await self._write_data(data)
 
     async def _check_len(self, name: str) -> bool:
+        """
+        Check key value len
+        """
         data = await self._read_data
         return True \
             if len(data[name]) <= self.max_key_len \
@@ -65,6 +83,9 @@ class Timer:
 
     @property
     async def _all_data(self) -> list:
+        """
+        All keys timer
+        """
         data = await self._read_data
         return [
             (key, len(data)) for key, data in data.items()
@@ -72,6 +93,9 @@ class Timer:
 
     @property
     async def write_result(self) -> bool:
+        """
+        Write result execute function
+        """
         if not self.name:
             return False
         _ = await self._add_key
@@ -83,6 +107,9 @@ class Timer:
         return await self._write_data(data)
 
     async def calc_avg(self, custom_handler: str = None) -> dict:
+        """
+        Calc average execution function time
+        """
         _ = await self._add_key
         _name = self.name \
             if not custom_handler \
@@ -99,6 +126,9 @@ class Timer:
         } if _data else 0
 
     async def all_handlers(self) -> dict:
+        """
+        All keys with values
+        """
         _data = await self._all_data
         return {key: {
             "time": await self.calc_avg(key), "len": len_
@@ -106,6 +136,10 @@ class Timer:
 
     @property
     async def build_response(self) -> str:
+        """
+        Formatted response with statistics
+        """
+
         async def _modify_template(answer_: list) -> None:
             answer_.insert(0, "-" * 20)
             answer_.insert(0, reply_dict["timings_title_template"])

@@ -27,6 +27,9 @@ class Heroku:
         }
 
     async def _request(self, func: str) -> dict or None:
+        """
+        Request to Heroku API
+        """
         async with ClientSession() as session:
             try:
                 async with session.get(
@@ -47,6 +50,10 @@ class Heroku:
 
     @property
     async def build_check(self) -> bool:
+        """
+        Check build data
+        """
+
         _redis_key = "last_build_id"
 
         async def _set_key(value: str = "null") -> None:
@@ -81,6 +88,10 @@ class Heroku:
 
     @property
     async def get_build(self) -> dict:
+        """
+        Check and return build data in dict type
+        """
+
         async def _check_build(data_: dict) -> bool:
             return True if data_["status"] == "succeeded" \
                 else False
@@ -113,6 +124,10 @@ class Heroku:
             if await _check_build(data[0]) else {}
 
     async def send_build_for_moderators(self) -> None:
+        """
+        Function for send all moderators build data
+        """
+
         get_moderators = await CheckModerator().get_moderators
         build_check = await self.build_check
         if build_check:

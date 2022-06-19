@@ -22,6 +22,9 @@ class Analytics:
 
     @async_timer
     async def _request_ga_server(self, params: dict, json: dict) -> None:
+        """
+        Request to Google Analytics API
+        """
         async with ClientSession() as session:
             try:
                 async with session.post(
@@ -38,7 +41,10 @@ class Analytics:
                     "Error send request to Google Analytics. Details: %s" % e)
 
     @property
-    async def _build_payload(self) -> dict:
+    def _build_payload(self) -> dict:
+        """
+        Build body for request to Google Analytics
+        """
         user_id = self.message.from_user.id
         return {
             'client_id': str(user_id),
@@ -55,9 +61,12 @@ class Analytics:
 
     @property
     async def send(self) -> _request_ga_server:
+        """
+        Method for send data
+        """
         return await self._request_ga_server({
             "measurement_id": self.id, "api_secret": self.secret
-        }, await self._build_payload)
+        }, self._build_payload)
 
     def __str__(self) -> str:
         return self.id
@@ -76,10 +85,6 @@ class AnalyticsMiddleware(BaseMiddleware):
 
     async def on_process_message(self, message: Message, data: dict):
         handler = current_handler.get()
-        # dispatcher = Dispatcher.get_current()
-        # await logger.debug(
-        #     "Analytics middleware (debug data): %s" %
-        #     [handler.__name__, dispatcher, message, data]
-        # )
+        _ = data
         await self._update_user(message)
         await Analytics(message=message, alt_action=handler.__name__).send

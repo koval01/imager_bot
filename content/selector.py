@@ -20,7 +20,10 @@ class Selector:
             dict(text=dict_reply[x], reply_markup=menu)
 
     @property
-    async def select_type(self) -> str:
+    def _select_type(self) -> str:
+        """
+        Select type for send content
+        """
         return [
             ["photo", "video", "voice"][i]
             for i, x in enumerate(menu_dict["select_mode"])
@@ -28,11 +31,18 @@ class Selector:
         ][0]
 
     @property
-    async def _select_order_mode(self) -> bool or None:
+    def _select_order_mode(self) -> bool or None:
+        """
+        Send content for user mode
+        """
         return True if self.order_mode(0) else (
             False if self.order_mode(1) else None)
 
     async def reply_selector(self) -> Message:
+        """
+        Function for build reply
+        """
+
         async def _dislike_try(content_id_: int, menu_: ReplyKeyboardMarkup) -> Message:
             dislike_process = await Manager().add_dislike(content_id_) \
                 if menu_dict["next_content"][2] == self.real_text else "skip"
@@ -47,10 +57,10 @@ class Selector:
                     "dislike_sent", menu_))
 
         try:
-            type_ = await self.select_type
+            type_ = self._select_type
             content_id, file_id = await Manager(
                 type_content=type_, message=self.msg,
-                get_content_random=await self._select_order_mode
+                get_content_random=self._select_order_mode
             ).get_content()
             await logger.info(
                 f"Get content. Data: content_id = {content_id}, file_id = {file_id}")
