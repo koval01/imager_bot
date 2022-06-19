@@ -1,3 +1,5 @@
+import logging as log
+
 from aiogram import types
 from sqlalchemy.future import select
 
@@ -8,7 +10,6 @@ from static.messages import dictionary as dict_reply
 from utils.decorators import async_timer
 from utils.log_module import logger
 from utils.moderator import CheckModerator
-import logging as log
 
 
 class LoaderContent:
@@ -56,7 +57,7 @@ class LoaderContent:
         """
         Check allow load for user
         """
-        return True if (await self._content_type and (
+        return True if (self._content_type and (
                 await self._check_content_on_moderation <= 100)
                         ) else False
 
@@ -77,7 +78,7 @@ class LoaderContent:
             if self.message.video_note:
                 return "video_note"
         except Exception as e:
-            await logger.error(
+            log.warning(
                 "Error check content type (%s). Details: %s" % (
                     self._video_note_check.__name__, e))
         return current_type

@@ -154,10 +154,10 @@ class Manager:
         """
         async with self.session.begin() as session:
             moderated_ = True
-            q = select(Content).\
+            q = select(Content). \
                 where(
                 Content.moderated == moderated_,
-                Content.type_content == self.type_content).\
+                Content.type_content == self.type_content). \
                 order_by(Content.id)
             result = await session.execute(q)
             curr = result.scalars()
@@ -300,12 +300,11 @@ class Manager:
         """
         try:
             async with self.session.begin() as session:
-                q = update(User).\
+                q = update(User). \
                     values(eval(
                         "{User.last_%s: User.last_%s + 1}" %
-                        tuple([self.type_content]*2)
-                    )).\
-                    where(User.user_id == self.user_id)
+                        tuple([self.type_content] * 2)
+                    )).where(User.user_id == self.user_id)
                 await session.execute(q)
                 await session.commit()
                 await session.close()
@@ -323,8 +322,8 @@ class Manager:
         """
         try:
             async with self.session.begin() as session:
-                q = update(Content).\
-                    where(Content.id == content_id).\
+                q = update(Content). \
+                    where(Content.id == content_id). \
                     values({Content.dislikes: Content.dislikes + 1})
                 await session.execute(q)
                 await session.commit()
