@@ -17,15 +17,22 @@ from utils.throttling import rate_limit
 from utils.timer import Timer
 
 
-@dp.message_handler(chat_type=[ChatType.SUPERGROUP, ChatType.GROUP])
+@dp.message_handler(
+    chat_type=[ChatType.SUPERGROUP, ChatType.GROUP], commands=["*"])
 @rate_limit(60, 'group_init')
 async def group_handler(msg: types.Message):
+    """
+    Calling a bot in a group
+    """
     await msg.reply(dict_reply["group_answer"])
 
 
 @dp.message_handler(is_full_banned=True)
 @rate_limit(60, 'full_banned_user')
 async def full_banned_user(msg: types.Message):
+    """
+    Call the bot by a blocked user
+    """
     await msg.reply(dict_reply["full_ban"])
 
 
@@ -33,6 +40,9 @@ async def full_banned_user(msg: types.Message):
     ViewContent.view_mode, TakeContent.wait_content
 ])
 async def cancel_action(msg: types.Message, state: FSMContext):
+    """
+    Cancel current action, reset
+    """
     await msg.reply(dict_reply["canceled_action"],
                     reply_markup=await build_menu("start_menu"))
     await state.finish()
@@ -41,6 +51,9 @@ async def cancel_action(msg: types.Message, state: FSMContext):
 @dp.message_handler(commands=['start', 'help'], state="*")
 @rate_limit(2, 'start_command')
 async def send_welcome(msg: types.Message, state: FSMContext):
+    """
+    Bot initialization, also alias cancel
+    """
     await msg.reply(dict_reply["start_message"],
                     reply_markup=await build_menu("start_menu"))
     await state.finish()
@@ -48,6 +61,7 @@ async def send_welcome(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=['test_log'], state="*", is_owner=True)
 async def test_log_handler(msg: types.Message):
+
     await msg.reply(dict_reply["test_log_reply"])
     log.info("Test log called from bot by admin.")
 
