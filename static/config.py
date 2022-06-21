@@ -20,6 +20,3 @@ DISLIKE_DISABLED = bool(getenv("DISLIKE_DISABLED"))
 
 GA_ID = getenv("GA_ID")
 GA_SECRET = getenv("GA_SECRET")
-
-HEROKU_API_KEY = getenv("HEROKU_API_KEY")
-HEROKU_APP_NAME = APP_DOMAIN.replace(".herokuapp.com", "")

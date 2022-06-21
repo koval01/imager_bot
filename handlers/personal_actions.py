@@ -11,7 +11,6 @@ from dispatcher import dp, bot
 from handlers.fsm import ViewContent, TakeContent
 from static.menu import build_menu, dictionary as dict_menu
 from static.messages import donate_answer, dictionary as dict_reply
-from utils.heroku import Heroku
 from utils.news import NewsSend
 from utils.throttling import rate_limit
 from utils.timer import Timer
@@ -69,14 +68,6 @@ async def test_log_handler(msg: types.Message):
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
 async def news_send_handler(msg: types.Message):
     return await NewsSend(message=msg, bot=bot).execute()
-
-
-@dp.message_handler(commands=['build'], state="*", is_moderator=True)
-async def build_data_handler(msg: types.Message):
-    json_body = await Heroku().get_build
-    return await msg.reply(dict_reply["build_data_template"] % (
-        dict_reply["build_current"], *(v for k, v in json_body.items())
-    ))
 
 
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
