@@ -63,10 +63,14 @@ class ContentAdmin(admin.ModelAdmin):
 
     list_display = ('id', 'loader_id', 'type_content', 'moderated')
     list_filter = ('moderated', 'type_content')
+    
     fields = ['media_tag', 'moderated', 'dislikes', 'type_content', 'loader_id', 'file_id']
-    search_fields = ['loader_id', 'file_id']
-    actions = [make_moderated, make_not_moderated]
     readonly_fields = ['media_tag', 'type_content', 'dislikes', 'loader_id', 'file_id']
+    search_fields = ['loader_id', 'file_id']
+    
+    actions = [make_moderated, make_not_moderated]
+    
+    list_per_page = 15
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -129,18 +133,20 @@ class UserAdmin(admin.ModelAdmin):
         'banned', 'full_banned'
     )
     list_filter = ('banned', 'full_banned')
+    
     fields = [
         'user_id', 'tg_name_user', 'tg_username_user', 'banned',
         'full_banned', 'last_photo', 'last_video', 'last_voice'
     ]
-    actions = [ban_user, unban_user, full_ban_user, full_unban_user]
     search_fields = ['user_id', 'tg_name_user', 'tg_username_user']
     readonly_fields = [
         'user_id', 'tg_name_user', 'tg_username_user',
         'last_photo', 'last_video', 'last_voice'
     ]
+    actions = [ban_user, unban_user, full_ban_user, full_unban_user]
 
     user_link.__name__ = 'Юзернейм пользователя'
+    list_per_page = 15
 
 
 class LogEntryAdmin(admin.ModelAdmin):
@@ -176,6 +182,7 @@ class LogEntryAdmin(admin.ModelAdmin):
         return False
 
     change_msg.__name__ = "Задействованные поля"
+    list_per_page = 50
 
 
 admin.site.register(Content, ContentAdmin)
