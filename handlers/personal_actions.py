@@ -66,11 +66,13 @@ async def test_log_handler(msg: types.Message):
 
 
 @dp.message_handler(commands=['news'], state="*", is_moderator=True)
+@dp.async_task
 async def news_send_handler(msg: types.Message):
     return await NewsSend(message=msg, bot=bot).execute()
 
 
 @dp.message_handler(commands=['timings'], state="*", is_moderator=True)
+@dp.async_task
 async def timings_check(msg: types.Message):
     await msg.reply(await Timer().build_response)
 
@@ -89,6 +91,7 @@ async def init_select(msg: types.Message):
 
 
 @dp.message_handler(lambda msg: msg.text == dict_menu["start_menu"][2])
+@dp.async_task
 @rate_limit(2, 'top_content_loaders_list')
 async def top_content_loaders_list(msg: types.Message):
     await msg.reply(
@@ -152,7 +155,6 @@ async def invalid_select_content(msg: types.Message):
 
 
 @dp.message_handler(lambda message: message.text not in dict_menu["next_content"], state=ViewContent.view_mode)
-@dp.async_task
 @rate_limit(0.6, 'error_select_content_action')
 async def invalid_select_action(msg: types.Message):
     await msg.reply(
@@ -173,6 +175,7 @@ async def invalid_select_get_mode(msg: types.Message):
     lambda message: message.text in [
         dict_menu["next_content"][1], dict_menu["next_content"][2]],
     state=ViewContent.view_mode)
+@dp.async_task
 @rate_limit(1, 'next_content')
 async def next_action(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
